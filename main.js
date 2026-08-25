@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 
 let mainWindow;
+const projectsFilePath = () => path.join(app.getPath('userData'), 'studio_projects.json');
+const configFilePath = () => path.join(app.getPath('userData'), 'studio_config.json');
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -10,7 +12,7 @@ function createWindow() {
     height: 800,
     minWidth: 1024,
     minHeight: 700,
-    title: 'Hollywood Agent Studio - IA Production Suite',
+    title: 'Hollywood Agent Studio v2.0 - IA Production Suite',
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -58,8 +60,9 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
       fs.mkdirSync(exportDir, { recursive: true });
     }
 
-    // Subdirectories structure
+    // Subdirectories structure v2.0
     const folders = [
+      '00_CONTINUITY_MEMORY_PATTERN',
       '01_SYSTEM_AGENTS_PROMPTS',
       '02_PROJECT_BIBLE',
       '03_CHARACTERS_CONCEPT',
@@ -73,6 +76,12 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
       const p = path.join(exportDir, dir);
       if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
     });
+
+    // 00: Memory & Continuity Pattern
+    fs.writeFileSync(
+      path.join(exportDir, '00_CONTINUITY_MEMORY_PATTERN', '00_SYSTEM_MEMORY_PATTERN.md'),
+      projectData.files.memoryPattern || ''
+    );
 
     // 01: System Agents Prompts
     fs.writeFileSync(
@@ -124,7 +133,7 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
       projectData.files.audio
     );
 
-    // Export ZIP Archive using adm-zip if available
+    // Export ZIP Archive using adm-zip
     let zipPath = `${exportDir}.zip`;
     try {
       const AdmZip = require('adm-zip');
@@ -147,7 +156,7 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
   }
 });
 
-// IPC Handler: Open Folder in Explorer
+// IPC Handler: Open Folder
 ipcMain.handle('open-folder', async (event, folderPath) => {
   if (folderPath && fs.existsSync(folderPath)) {
     shell.openPath(folderPath);
@@ -156,13 +165,12 @@ ipcMain.handle('open-folder', async (event, folderPath) => {
   return false;
 });
 
-// IPC Handler: Save Settings
-const configPath = path.join(app.getPath('userData'), 'studio_config.json');
-
+// IPC Handlers: Settings
 ipcMain.handle('get-settings', () => {
   try {
-    if (fs.existsSync(configPath)) {
-      return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    const file = configFilePath();
+    if (fs.existsSync(file)) {
+      return JSON.parse(fs.readFileSync(file, 'utf8'));
     }
   } catch (e) {
     console.error('Error reading settings:', e);
@@ -181,7 +189,29 @@ ipcMain.handle('get-settings', () => {
 
 ipcMain.handle('save-settings', (event, settings) => {
   try {
-    fs.writeFileSync(configPath, JSON.stringify(settings, null, 2));
+    fs.writeFileSync(configFilePath(), JSON.stringify(settings, null, 2));
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
+// IPC Handlers: Projects CRUD (Sidebar Management)
+ipcMain.handle('get-projects', () => {
+  try {
+    const file = projectsFilePath();
+    if (fs.existsSync(file)) {
+      return JSON.parse(fs.readFileSync(file, 'utf8'));
+    }
+  } catch (e) {
+    console.error('Error loading projects:', e);
+  }
+  return [];
+});
+
+ipcMain.handle('save-projects', (event, projects) => {
+  try {
+    fs.writeFileSync(projectsFilePath(), JSON.stringify(projects, null, 2));
     return { success: true };
   } catch (e) {
     return { success: false, error: e.message };

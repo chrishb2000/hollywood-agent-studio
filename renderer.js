@@ -1,13 +1,16 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO - RENDERER SCRIPT & AI ENGINE ORCHESTRATOR
+   HOLLYWOOD AGENT STUDIO v2.0 - RENDERER SCRIPT & PROJECT MANAGER
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  
+
   // State Management
   let currentStep = 1;
   let currentTheme = 'dark';
   let generatedData = null;
+  let savedProjects = [];
+  let currentProjectId = null;
+
   let appSettings = {
     provider: 'offline',
     geminiKey: '',
@@ -19,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     theme: 'dark'
   };
 
-  // Load Initial Settings from IPC if available
+  // Load Initial Settings & Projects
   if (window.electronAPI) {
     window.electronAPI.getSettings().then(saved => {
       if (saved) {
@@ -28,7 +31,220 @@ document.addEventListener('DOMContentLoaded', () => {
         applySettingsToUI();
       }
     });
+
+    loadSavedProjectsFromStorage();
   }
+
+  /* ==========================================
+     SIDEBAR & PROJECTS MANAGEMENT (CRUD)
+     ========================================== */
+  const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+  const sidebarProjects = document.getElementById('sidebar-projects');
+  const btnNewProject = document.getElementById('btn-new-project');
+  const btnSaveProjectQuick = document.getElementById('btn-save-project-quick');
+  const projectsListContainer = document.getElementById('projects-list-container');
+
+  if (btnToggleSidebar && sidebarProjects) {
+    btnToggleSidebar.addEventListener('click', () => {
+      sidebarProjects.classList.toggle('collapsed');
+    });
+  }
+
+  async function loadSavedProjectsFromStorage() {
+    if (!window.electronAPI) return;
+    try {
+      savedProjects = await window.electronAPI.getProjects() || [];
+      renderProjectsSidebar();
+    } catch (e) {
+      console.error('Error loading projects:', e);
+    }
+  }
+
+  async function saveProjectsToStorage() {
+    if (!window.electronAPI) return;
+    try {
+      await window.electronAPI.saveProjects(savedProjects);
+      renderProjectsSidebar();
+    } catch (e) {
+      console.error('Error saving projects:', e);
+    }
+  }
+
+  function renderProjectsSidebar() {
+    if (!projectsListContainer) return;
+    projectsListContainer.innerHTML = '';
+
+    if (savedProjects.length === 0) {
+      projectsListContainer.innerHTML = `
+        <div class="sidebar-empty-state">
+          <i class="fa-solid fa-film"></i>
+          <p>No hay proyectos guardados. Configura uno y presiona "Guardar".</p>
+        </div>
+      `;
+      return;
+    }
+
+    savedProjects.forEach(proj => {
+      const item = document.createElement('div');
+      item.className = `project-item ${proj.id === currentProjectId ? 'active' : ''}`;
+      
+      item.innerHTML = `
+        <div class="project-item-info">
+          <span class="project-item-title">${proj.title || 'Proyecto Sin Título'}</span>
+          <span class="project-item-sub">${proj.type || 'Producción'} • ${proj.episodesCount || 1} cap</span>
+        </div>
+        <button class="btn-delete-project" data-id="${proj.id}" title="Eliminar Proyecto">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      `;
+
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-delete-project')) return;
+        loadProjectIntoUI(proj);
+      });
+
+      const btnDelete = item.querySelector('.btn-delete-project');
+      btnDelete.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteProject(proj.id);
+      });
+
+      projectsListContainer.appendChild(item);
+    });
+  }
+
+  function getWizardFormData() {
+    return {
+      projectType: document.getElementById('project-type').value,
+      projectTitle: document.getElementById('project-title').value.trim() || 'Producción Audiovisual',
+      episodesCount: parseInt(document.getElementById('episodes-count').value) || 4,
+      episodeDuration: document.getElementById('episode-duration').value,
+      storyPremise: document.getElementById('story-premise').value,
+      storyGenre: document.getElementById('story-genre').value,
+      narrativeTone: document.getElementById('narrative-tone').value,
+      protagonistDetails: document.getElementById('protagonist-details').value,
+      secondaryCharacters: document.getElementById('secondary-characters').value,
+      keyLocations: document.getElementById('key-locations').value,
+      visualEra: document.getElementById('visual-era').value,
+      colorPalette: document.getElementById('color-palette').value,
+      artStyle: document.getElementById('art-style').value,
+      cameraStyle: document.getElementById('camera-style').value,
+      voiceoverStyle: document.getElementById('voiceover-style').value,
+      musicStyle: document.getElementById('music-style').value
+    };
+  }
+
+  function setWizardFormData(data) {
+    if (data.projectType) document.getElementById('project-type').value = data.projectType;
+    if (data.projectTitle) document.getElementById('project-title').value = data.projectTitle;
+    if (data.episodesCount) document.getElementById('episodes-count').value = data.episodesCount;
+    if (data.episodeDuration) document.getElementById('episode-duration').value = data.episodeDuration;
+    if (data.storyPremise) document.getElementById('story-premise').value = data.storyPremise;
+    if (data.storyGenre) document.getElementById('story-genre').value = data.storyGenre;
+    if (data.narrativeTone) document.getElementById('narrative-tone').value = data.narrativeTone;
+    if (data.protagonistDetails) document.getElementById('protagonist-details').value = data.protagonistDetails;
+    if (data.secondaryCharacters) document.getElementById('secondary-characters').value = data.secondaryCharacters;
+    if (data.keyLocations) document.getElementById('key-locations').value = data.keyLocations;
+    if (data.visualEra) document.getElementById('visual-era').value = data.visualEra;
+    if (data.colorPalette) document.getElementById('color-palette').value = data.colorPalette;
+    if (data.artStyle) document.getElementById('art-style').value = data.artStyle;
+    if (data.cameraStyle) document.getElementById('camera-style').value = data.cameraStyle;
+    if (data.voiceoverStyle) document.getElementById('voiceover-style').value = data.voiceoverStyle;
+    if (data.musicStyle) document.getElementById('music-style').value = data.musicStyle;
+  }
+
+  function saveCurrentProjectState() {
+    const formData = getWizardFormData();
+    if (!currentProjectId) {
+      currentProjectId = 'proj_' + Date.now();
+    }
+
+    const existingIndex = savedProjects.findIndex(p => p.id === currentProjectId);
+    const projectRecord = {
+      id: currentProjectId,
+      title: formData.projectTitle,
+      type: formData.projectType,
+      episodesCount: formData.episodesCount,
+      updatedAt: new Date().toISOString(),
+      formData: formData,
+      generatedData: generatedData
+    };
+
+    if (existingIndex >= 0) {
+      savedProjects[existingIndex] = projectRecord;
+    } else {
+      savedProjects.unshift(projectRecord);
+    }
+
+    saveProjectsToStorage();
+    alert(`Proyecto "${formData.projectTitle}" guardado correctamente.`);
+  }
+
+  function loadProjectIntoUI(proj) {
+    currentProjectId = proj.id;
+    if (proj.formData) setWizardFormData(proj.formData);
+
+    if (proj.generatedData) {
+      generatedData = proj.generatedData;
+      document.getElementById('output-memory').value = generatedData.files.memoryPattern || '';
+      document.getElementById('output-script').value = generatedData.files.scripts || '';
+      document.getElementById('output-characters').value = generatedData.files.characters || '';
+      document.getElementById('output-camera').value = generatedData.files.cinematography || '';
+      document.getElementById('output-audio').value = generatedData.files.audio || '';
+      renderAvatarCards(generatedData.characterList || []);
+    }
+
+    renderProjectsSidebar();
+  }
+
+  function createNewProject() {
+    currentProjectId = 'proj_' + Date.now();
+    generatedData = null;
+
+    setWizardFormData({
+      projectType: 'Serie Web / TV',
+      projectTitle: 'Nueva Producción Hollywood',
+      episodesCount: 4,
+      episodeDuration: '3 a 5 minutos',
+      storyPremise: '',
+      storyGenre: 'Drama Motivacional / Superación',
+      narrativeTone: 'Inspíralo y Emotivo',
+      protagonistDetails: '',
+      secondaryCharacters: '',
+      keyLocations: '',
+      visualEra: 'Época Contemporánea / Actual',
+      colorPalette: 'Colores cinematográficos',
+      artStyle: 'Fotorrealista Cinematográfico (35mm Anamórfico)',
+      cameraStyle: 'Movimientos Dinámicos (Dolly, Steadicam, Drone Shots)',
+      voiceoverStyle: 'Voz Masculina Grave y Profunda (Narrador Hollywood)',
+      musicStyle: 'Sintetizador y Orquesta'
+    });
+
+    document.getElementById('output-memory').value = '';
+    document.getElementById('output-script').value = '';
+    document.getElementById('output-characters').value = '';
+    document.getElementById('output-camera').value = '';
+    document.getElementById('output-audio').value = '';
+    document.getElementById('avatar-cards-container').innerHTML = `
+      <div class="avatar-placeholder-box">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <p>Configura tu nuevo proyecto y presiona "Generar Producción Completa".</p>
+      </div>
+    `;
+
+    renderProjectsSidebar();
+  }
+
+  function deleteProject(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este proyecto?')) {
+      savedProjects = savedProjects.filter(p => p.id !== id);
+      if (currentProjectId === id) currentProjectId = null;
+      saveProjectsToStorage();
+    }
+  }
+
+  if (btnNewProject) btnNewProject.addEventListener('click', createNewProject);
+  if (btnSaveProjectQuick) btnSaveProjectQuick.addEventListener('click', saveCurrentProjectState);
 
   /* ==========================================
      NAV TABS SWITCHING
@@ -196,53 +412,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     HOLLYWOOD AI AGENTS ENGINE & ORCHESTRATION
+     HOLLYWOOD 10 AGENTS ENGINE & ORCHESTRATION v2.0
      ========================================== */
   const btnRunGeneration = document.getElementById('btn-run-generation');
 
   btnRunGeneration.addEventListener('click', async () => {
-    const projectType = document.getElementById('project-type').value;
-    const projectTitle = document.getElementById('project-title').value.trim() || 'Producción Audiovisual';
-    const episodesCount = parseInt(document.getElementById('episodes-count').value) || 4;
-    const episodeDuration = document.getElementById('episode-duration').value;
-    const storyPremise = document.getElementById('story-premise').value;
-    const storyGenre = document.getElementById('story-genre').value;
-    const narrativeTone = document.getElementById('narrative-tone').value;
-    const protagonistDetails = document.getElementById('protagonist-details').value;
-    const secondaryCharacters = document.getElementById('secondary-characters').value;
-    const keyLocations = document.getElementById('key-locations').value;
-    const visualEra = document.getElementById('visual-era').value;
-    const colorPalette = document.getElementById('color-palette').value;
-    const artStyle = document.getElementById('art-style').value;
-    const cameraStyle = document.getElementById('camera-style').value;
-    const voiceoverStyle = document.getElementById('voiceover-style').value;
-    const musicStyle = document.getElementById('music-style').value;
+    const inputs = getWizardFormData();
 
     btnRunGeneration.disabled = true;
-    btnRunGeneration.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ORQUESTANDO AGENTES DE HOLLYWOOD...';
+    btnRunGeneration.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ORQUESTANDO RED DE 10 AGENTES IA & MEMORIA...';
 
     setTimeout(() => {
       // Build Full Production Output Data
-      generatedData = buildHollywoodProductionBundle({
-        projectType,
-        projectTitle,
-        episodesCount,
-        episodeDuration,
-        storyPremise,
-        storyGenre,
-        narrativeTone,
-        protagonistDetails,
-        secondaryCharacters,
-        keyLocations,
-        visualEra,
-        colorPalette,
-        artStyle,
-        cameraStyle,
-        voiceoverStyle,
-        musicStyle
-      });
+      generatedData = buildHollywoodProductionBundleV2(inputs);
 
       // Update Output Textareas
+      document.getElementById('output-memory').value = generatedData.files.memoryPattern;
       document.getElementById('output-script').value = generatedData.files.scripts;
       document.getElementById('output-characters').value = generatedData.files.characters;
       document.getElementById('output-camera').value = generatedData.files.cinematography;
@@ -251,184 +436,222 @@ document.addEventListener('DOMContentLoaded', () => {
       // Render Visual Avatars & Scenarios Cards
       renderAvatarCards(generatedData.characterList);
 
+      // Auto save to projects
+      saveCurrentProjectState();
+
       btnRunGeneration.disabled = false;
-      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN COMPLETA CON RED DE AGENTES IA';
+      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN COMPLETA (10 AGENTES IA + PATRÓN MEMORIA)';
 
-      // Switch to Script Tab automatically
-      const scriptTabBtn = document.querySelector('[data-tab="tab-script"]');
-      if (scriptTabBtn) scriptTabBtn.click();
+      // Switch to Memory Tab automatically
+      const memoryTabBtn = document.querySelector('[data-tab="tab-memory"]');
+      if (memoryTabBtn) memoryTabBtn.click();
 
-      alert(`¡Producción completada con éxito para "${projectTitle}"!\nSe han generado todos los guiones, prompts de agentes, skills, planos y especificaciones de audio.`);
-    }, 1200);
+      alert(`¡Producción completada con éxito para "${inputs.projectTitle}"!\nSe ha generado el Patrón de Memoria Continuada, los guiones desglosados, las fichas de vestuario y la directiva de 10 Agentes.`);
+    }, 1400);
   });
 
   /* ==========================================
-     HOLLYWOOD AGENTS CONTENT GENERATOR
+     HOLLYWOOD AGENTS v2.0 CONTENT GENERATOR
      ========================================== */
-  function buildHollywoodProductionBundle(inputs) {
+  function buildHollywoodProductionBundleV2(inputs) {
     const title = inputs.projectTitle;
     const episodes = inputs.episodesCount;
     const type = inputs.projectType;
 
-    // Parse Characters List
+    // Parse Characters List with Fixed IDs
     const characterList = [
-      { name: extractName(inputs.protagonistDetails) || 'Protagonista', role: 'Protagonista Principal', details: inputs.protagonistDetails }
+      { 
+        id: 'CHAR_01_PROTAGONIST',
+        name: extractName(inputs.protagonistDetails) || 'Carlos',
+        role: 'Protagonista Principal',
+        details: inputs.protagonistDetails,
+        wardrobeStart: 'Camisa desgastada azul oscuro, jeans descoloridos, tenis viejos',
+        wardrobeEnd: 'Traje de tres piezas gris marengo italiano, reloj de pulsera de lujo, zapatos Oxford de cuero pulido'
+      }
     ];
 
     const secondLines = inputs.secondaryCharacters.split('\n').filter(l => l.trim().length > 0);
     secondLines.forEach((line, idx) => {
       characterList.push({
-        name: extractName(line) || `Personaje ${idx + 2}`,
+        id: `CHAR_0${idx + 2}_SECONDARY`,
+        name: extractName(line) || `Personaje_${idx + 2}`,
         role: 'Personaje Secundario / Antagonista',
-        details: line
+        details: line,
+        wardrobeStart: 'Atuendo profesional formal según su rol',
+        wardrobeEnd: 'Atuendo formal con accesorios distintivos'
       });
     });
 
-    // 01: System Agents Prompts & Skills Rules
-    const systemPrompts = `# HOLLYWOOD AI SYSTEM PROMPTS & AGENT ARCHITECTURE
+    // 00: PATRÓN DE MEMORIA CONTINUADA (AI MEMORY PATTERN)
+    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN)
 PROYECTO: ${title.toUpperCase()}
-FORMATO: ${type} (${episodes} Capítulos - ${inputs.episodeDuration})
-GÉNERO: ${inputs.storyGenre}
+ID DE SEMILLA DE PRODUCCIÓN: SEED_${title.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_2026
+
+================================================================================
+REGLA N° 1 DE MEMORIA DIRECTA (INSTRUCCIÓN PARA CUALQUIER IA):
+"Memoriza este diccionario de producción como verdades absolutas. Bajo ninguna circunstancia cambies los nombres, las características faciales, los identificadores de vestuario ni las reglas de continuidad establecidas en este archivo."
+================================================================================
+
+## 🎭 DICCIONARIO MATRICIAL DE PERSONAJES (FIXED CHARACTER TOKENS):
+
+${characterList.map(char => `
+### [${char.id}] -> ${char.name.toUpperCase()}
+- **Nombre Fijo:** ${char.name}
+- **Rol:** ${char.role}
+- **Rasgos Físicos Permanentes:** ${char.details}
+- **Fase 1 Vestuario (Pobreza/Inicio):** ${char.wardrobeStart}
+- **Fase 2 Vestuario (Éxito/Clímax):** ${char.wardrobeEnd}
+- **Token Visual Midjourney/Flux:** \`[FACE_SEED_${char.name.toUpperCase()}_8K]\`
+`).join('\n')}
 
 ---
 
-## 🎭 AGENTE 1: EXECUTIVE PRODUCER & SHOWRUNNER
-### SYSTEM PROMPT:
-"Eres el Showrunner y Productor Ejecutivo Principal de Hollywood con más de 20 años de experiencia dirigiendo grandes producciones cinematográficas y series premiadas. Tu objetivo es mantener la visión de alto nivel, coherencia temática, control presupuestario creativo y garantizar que la narrativa del proyecto '${title}' resuene profundamente con la audiencia objetivo."
+## 🏛️ DICCIONARIO MATRICIAL DE ESCENARIOS (FIXED SCENARIO TOKENS):
 
-### REGLAS & SKILLS DEL AGENTE:
-- Mantener siempre el tono: ${inputs.narrativeTone}.
-- Garantizar arcos dramáticos sólidos en los ${episodes} capítulos.
-- Supervisar la alineación entre la iluminación (${inputs.colorPalette}) y la evolución emocional de los personajes.
+### [LOC_01_INITIAL_LOCATION]
+- **Nombre:** Entorno de Origen
+- **Descripción Fija:** ${inputs.keyLocations.split('\n')[0] || 'Habitación humilde'}
+- **Iluminación Fija:** Tonalidades azules frías, lámpara de mesa tenue.
 
----
-
-## 🎬 AGENTE 2: LEAD SCREENWRITER (GUIONISTA PRINCIPAL)
-### SYSTEM PROMPT:
-"Eres un guionista cinematográfico con estilo narrativo brillante en el estándar Hollywood Formatted Script. Tu función es redactar diálogos naturales, subtextos potentes, descripciones de acción dinámicas y ganchos finales (cliffhangers) en cada episodio."
-
-### REGLAS & SKILLS DEL AGENTE:
-- Formato de texto: Estándar de guion de cine (ENCABEZADO DE ESCENA, ACCIÓN, PERSONAJE, DIÁLOGO, (ACOTACIÓN)).
-- Ritmo narrativo calibrado para episodios de ${inputs.episodeDuration}.
+### [LOC_02_CLIMAX_LOCATION]
+- **Nombre:** Entorno de Éxito Corporativo
+- **Descripción Fija:** Edificio de alta tecnología con ventanales de cristal panorámicos sobre la metrópoli.
+- **Iluminación Fija:** Luz dorada cálida de hora mágica (Golden Hour), alto contraste cinematográfico.
 
 ---
 
-## 🎥 AGENTE 3: DIRECTOR OF PHOTOGRAPHY (CINEMATOGRAPHER)
-### SYSTEM PROMPT:
-"Eres el Director de Fotografía jefe del proyecto '${title}'. Tu meta es traducir las escenas en prompts cinematográficos hiperrealistas para generadores de video por IA (Runway Gen-3, OpenAI Sora, Pika Labs, Luma Dream Machine)."
-
-### REGLAS & SKILLS DEL AGENTE:
-- Especificar siempre: Tipo de lente (35mm, 50mm, anamórfico), ángulo de cámara, movimiento (Dolly in, Pan, Crane shot, Handheld), tipo de sensor y paleta cromática.
-- Estilo visual asignado: ${inputs.artStyle}.
-
----
-
-## 🎨 AGENTE 4: CONCEPT ARTIST & CHARACTER DESIGNER
-### SYSTEM PROMPT:
-"Eres el Diseñador de Concepto y Artista de Personajes. Generas prompts técnicos para Midjourney v6, Flux.1 y DALL-E 3 que garantizan consistencia de rostro, vestuario y ambientación en todas las tomas del proyecto."
-
----
-
-## 🎧 AGENTE 5: AUDIO & SOUNDTRACK DIRECTOR
-### SYSTEM PROMPT:
-"Eres el Director de Sonido y Locución. Creas la pista de voz (Voiceover) formateada con etiquetas de síntesis de voz ElevenLabs ([sighs], [confident tone], [whispering]), efectos Foley y la ambientación musical."
+## 📋 REGLAS ESTRICTAS DE CONTINUIDAD (SCRIPT SUPERVISOR DIRECTIVES):
+1. **Consistencia de Rostro:** En todas las escenas donde aparezca \`[CHAR_01_PROTAGONIST]\`, los rasgos faciales deben ser idénticos (mismo corte de cabello, tono de piel y postura).
+2. **Evolución del Vestuario:** El personaje NUNCA debe aparecer vistiendo el traje de lujo en el Capítulo 1, ni vistiendo la ropa desgastada en el Capítulo 4. La transición ocurre estrictamente en el Capítulo 3.
+3. **Coherencia Cromática:** La paleta cromática de fondo debe cumplir estrictamente: "${inputs.colorPalette}".
 `;
 
-    const agentRules = `# AGENT RULES & SKILLS CONFIGURATION FILE (.agents / .antigravity)
+    // 01: System Agents Prompts (10 Agents)
+    const systemPrompts = `# HOLLYWOOD AI SYSTEM PROMPTS (RED DE 10 AGENTES ESPECIALIZADOS)
+PROYECTO: ${title.toUpperCase()}
+SHOWRUNNER DIRECTIVE & MASTER CONTROL
 
-## REGISTRANTE DE AGENTES ACTIVOS:
-1. ExecutiveProducerAgent -> Role: Director General
-2. ScreenwriterAgent -> Role: Redactor de Guiones
-3. CinematographerAgent -> Role: Generador de Prompts de Cámara
-4. ConceptArtistAgent -> Role: Artista de Consistencia Visual
-5. SoundDirectorAgent -> Role: Diseñador de Voz & Audio
+---
 
-## INSTRUCCIONES DE INTEGRACIÓN EN LLMs (ChatGPT / Claude / Gemini / Ollama):
-- Copiar las secciones de SYSTEM PROMPT en las configuraciones de Custom GPTs, Claude Projects o System Prompts de Ollama.
-- Utilizar las reglas del proyecto como guía de contexto persistente.
+## 🎬 1. MASTER DIRECTOR & ORQUESTADOR GENERAL
+"Eres el Director Supremo de Cine de Hollywood. Tu objetivo es orquestar a los otros 9 agentes para garantizar que la película '${title}' mantenga una narrativa impecable, emoción en cada plano y cero desviaciones del patrón de memoria."
+
+## 📋 2. SCRIPT SUPERVISOR & AGENTE DE CONTINUIDAD
+"Supervisas cada objeto, prenda de vestir, posición de luz y peinado entre corte y corte. Si detectas alguna incoherencia entre escenas, la corriges inmediatamente."
+
+## ✍️ 3. GUIONISTA PRINCIPAL (LEAD SCREENWRITER)
+"Redactas diálogos dinámicos, subtextos y arcos dramáticos en formato estándar de guion de cine para los ${episodes} capítulos."
+
+## 🎥 4. DIRECTOR DE FOTOGRAFÍA (CINEMATOGRAPHER)
+"Diseñas los planos de cámara (Shot List), especificando lentes de 35mm anamórficos, movimientos de Dolly/Steadicam y prompts de video para Runway Gen-3, Sora y Pika."
+
+## 🏛️ 5. DIRECTOR DE ARTE & ESCENARIOS
+"Diseñas la arquitectura visual, utilería de época y decorados para los escenarios del proyecto."
+
+## 👔 6. ESPECIALISTA DE VESTUARIO & STYLING (WARDROBE DIRECTOR)
+"Garantizas que cada personaje use el atuendo exacto según su evolución socioeconómica en la historia."
+
+## 🎨 7. DISEÑADOR DE CONCEPTO & CONSISTENCIA DE ROSTROS
+"Generas prompts matriciales con tokens fijos ([CHAR_ID]) para Midjourney v6 y Flux.1."
+
+## 🎧 8. INGENIERO DE SONIDO & LOCUCIÓN ELEVENLABS
+"Formateas las voces con marcas temporales ([confident], [whispering]) y compones la banda sonora."
+
+## 🎞️ 9. COLORISTA & DIRECTOR DE POST-PRODUCCIÓN
+"Aplicas las curvas de etalonaje digital (Color Grading), grano de película 35mm y ritmo de corte."
+
+## 🧠 10. ARQUITECTO DE MEMORIA CONTINUADA
+"Mantienes actualizado el archivo 00_SYSTEM_MEMORY_PATTERN.md para fijar la memoria de cualquier IA."
+`;
+
+    const agentRules = `# AGENT RULES & SKILLS CONFIGURATION FILE v2.0 (.agents / .antigravity)
+
+## LISTA DE AGENTES ACTIVOS EN MEMORIA:
+- MasterDirectorAgent
+- ContinuitySupervisorAgent
+- LeadScreenwriterAgent
+- CinematographerAgent
+- ProductionArtDirectorAgent
+- WardrobeStylistAgent
+- CharacterConsistencyAgent
+- SoundDirectorAgent
+- ColoristPostAgent
+- MemoryArchitectAgent
 `;
 
     // 02: Project Bible
-    const projectBible = `# BIBLIA DE PRODUCCIÓN CINEMATOGRÁFICA
+    const projectBible = `# BIBLIA DE PRODUCCIÓN CINEMATOGRÁFICA (MASTER BIBLE v2.0)
 **PROYECTO:** ${title}
-**TIPO:** ${type}
-**CANTIDAD DE CAPÍTULOS:** ${episodes}
+**FORMATO:** ${type} (${episodes} Capítulos)
 **DURACIÓN:** ${inputs.episodeDuration} por capítulo
 **GÉNERO:** ${inputs.storyGenre}
-**TONO:** ${inputs.narrativeTone}
-**ÉPOCA & AMBIENTACIÓN:** ${inputs.visualEra}
+**TONO NARRATIVO:** ${inputs.narrativeTone}
 **PALETA DE COLORES:** ${inputs.colorPalette}
 **ESTILO VISUAL:** ${inputs.artStyle}
 
 ---
 
-## 📝 SINOPSIS EJECUTIVA & PREMISA
+## 📝 PREMISA GENERAL
 ${inputs.storyPremise}
 
 ---
 
-## 🎯 ESTRUCTURA NARRATIVA DE ${episodes} CAPÍTULOS
-
-${generateEpisodesBreakdown(episodes, title, inputs.storyPremise)}
+## 🎯 ESTRUCTURA NARRATIVA DE ${episodes} CAPÍTULOS CON PATRÓN DE CONTINUIDAD
+${generateEpisodesBreakdownV2(episodes, title, characterList)}
 `;
 
-    // 03: Characters Dossier
-    const characters = `# DOSSIER TÉCNICO DE PERSONAJES & PROMPTS DE IMAGEN (CONSISTENCY GUIDES)
+    // 03: Characters & Wardrobe Dossier
+    const characters = `# DOSSIER TÉCNICO DE PERSONAJES, VESTUARIO & PROMPTS DE CONSISTENCIA
 
 ${characterList.map((char, index) => `
-### PERSONAJE ${index + 1}: ${char.name.toUpperCase()} (${char.role})
-- **Detalles:** ${char.details}
-- **Estilo de Vestuario:** Adaptativo según la evolución de la historia (${inputs.visualEra}).
-- **PROMPT DE CONSISTENCIA PARA MIDJOURNEY / FLUX:**
-  \`\`\`text
-  Cinematic portrait shot of ${char.name}, ${char.details}, ${inputs.artStyle}, photorealistic, dramatic studio lighting, 8k resolution, color palette ${inputs.colorPalette}, shot on 35mm lens --ar 16:9 --style raw --v 6.0
-  \`\`\`
+### PERSONAJE ${index + 1}: ${char.name.toUpperCase()} (ID: ${char.id})
+- **Rol:** ${char.role}
+- **Descripción Físico-Psicológica:** ${char.details}
+- **Fase de Origen - Vestuario:** ${char.wardrobeStart}
+- **Fase de Éxito - Vestuario:** ${char.wardrobeEnd}
+
+#### PROMPT DE CONSISTENCIA FACIAL (MIDJOURNEY v6 / FLUX.1):
+\`\`\`text
+Cinematic character reference sheet of ${char.name}, ${char.details}, wearing ${char.wardrobeStart}, ${inputs.artStyle}, photorealistic 8k, dramatic lighting, color palette ${inputs.colorPalette}, shot on 35mm anamorphic lens --ar 16:9 --style raw --v 6.0
+\`\`\`
 `).join('\n---\n')}
 `;
 
     // 04: Scenarios Dossier
-    const environments = `# DOSSIER DE ESCENARIOS, ENTORNOS & ILUMINACIÓN
+    const environments = `# DOSSIER DE ESCENARIOS, ARQUITECTURA DE SETS & ILUMINACIÓN
 
-## ENTORNOS PRINCIPALES DEL PROYECTO:
+## ENTORNOS PRINCIPALES DE LA PRODUCCIÓN:
 ${inputs.keyLocations}
 
 ---
 
-## PROMPTS TÉCNICOS DE ENTORNO PARA GENERADORES VISUALES:
-
-### ESCENARIO 1: ENTORNO INICIAL (ORIGEN)
+## PROMPTS MATRICIALES PARA ESCENARIOS:
 \`\`\`text
-Wide cinematic shot of ${inputs.keyLocations.split('\n')[0] || 'Initial Scene'}, ${inputs.visualEra}, atmospheric mood, lighting in ${inputs.colorPalette}, ${inputs.artStyle}, octane render, photorealistic, 8k --ar 16:9
-\`\`\`
-
-### ESCENARIO 2: ENTORNO CLÍMAX & ÉXITO
-\`\`\`text
-Extreme wide majestic shot of high-tech modern skyscraper interior overlooking city skyline, golden hour lighting, cinematic luxury, ${inputs.artStyle}, photorealistic, 8k resolution --ar 16:9
+Wide cinematic interior of ${inputs.keyLocations.split('\n')[0] || 'Initial Location'}, ${inputs.visualEra}, realistic textures, lighting in ${inputs.colorPalette}, ${inputs.artStyle}, 8k resolution --ar 16:9
 \`\`\`
 `;
 
     // 05: Scripts Breakdown
-    const scripts = `# GUION DESGLOSADO CINEMATOGRÁFICO
+    const scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR ESCENAS
 PROYECTO: ${title}
-TOTAL DE CAPÍTULOS: ${episodes}
+CONTINUIDAD GARANTIZADA POR SCRIPT SUPERVISOR
 
-${generateFullScriptText(episodes, title, characterList, inputs)}
+${generateFullScriptTextV2(episodes, title, characterList)}
 `;
 
-    // 06: Cinematography & Camera Shot List
-    const cinematography = `# GUÍA DE DIRECCIÓN DE CÁMARA & PROMPTS PARA AI VIDEO GENERATORS
+    // 06: Cinematography & Shot List
+    const cinematography = `# DIRECCIÓN DE CÁMARA, SHOT LIST & PROMPTS DE VIDEO (AI VIDEO ENGINE)
 ESTILO DE CÁMARA: ${inputs.cameraStyle}
-ESTILO VISUAL: ${inputs.artStyle}
 
-${generateCameraShotList(episodes, characterList, inputs)}
+${generateCameraShotListV2(episodes, characterList, inputs)}
 `;
 
     // 07: Audio & Voiceover Guide
-    const audio = `# DOSSIER DE AUDIO, VOICE OVER & DIRECCIÓN MUSICAL
+    const audio = `# DIRECCIÓN DE SONIDO, VOICE OVER ELEVENLABS & MÚSICA
 ESTILO DE LOCUCIÓN: ${inputs.voiceoverStyle}
-DIRECCIÓN MUSICAL: ${inputs.musicStyle}
+BANDA SONORA: ${inputs.musicStyle}
 
-${generateAudioScript(episodes, characterList, inputs)}
+${generateAudioScriptV2(episodes, characterList, inputs)}
 `;
 
     return {
@@ -440,9 +663,10 @@ ${generateAudioScript(episodes, characterList, inputs)}
         episodesCount: episodes,
         genre: inputs.storyGenre,
         generatedAt: new Date().toISOString(),
-        engine: 'Hollywood Agent Studio IA Suite'
+        engine: 'Hollywood Agent Studio v2.0 IA Suite'
       },
       files: {
+        memoryPattern,
         systemPrompts,
         agentRules,
         projectBible,
@@ -461,29 +685,23 @@ ${generateAudioScript(episodes, characterList, inputs)}
     return match ? match[1] : null;
   }
 
-  function generateEpisodesBreakdown(episodesCount, title, premise) {
+  function generateEpisodesBreakdownV2(episodesCount, title, characterList) {
     let breakdown = '';
-    const episodeNames = [
-      'El Origen y la Tormenta',
-      'La Chispas de la Innovación',
-      'Traiciones y la Gran Pruebas de Fuego',
-      'La Cumbre y el Imperio Recobrado'
-    ];
+    const protagonist = characterList[0]?.name || 'Carlos';
 
     for (let i = 1; i <= episodesCount; i++) {
-      const epTitle = episodeNames[i - 1] || `Capítulo ${i}: La Transformación Continúa`;
       breakdown += `
-### CAPÍTULO ${i}: "${epTitle}"
-- **Objetivo Narrativo:** Mostrar la fase ${i} del arco dramático en la historia de superación.
-- **Conflicto Principal:** ${i === 1 ? 'Luchar contra la escasez y los prejuicios del entorno.' : i === 2 ? 'Construir el primer prototipo funcional enfrentando la falta de recursos.' : i === 3 ? 'Enfrentar la traición de socios e inversionistas.' : 'Alcanzar el triunfo financiero y consolidar el legado.'}
-- **Escenario Clave:** Escenario de Fase ${i}.
-- **Gancho Final (Cliffhanger):** Momento decisivo de alta tensión emocional que impulsa al espectador al siguiente capítulo.
+### CAPÍTULO ${i}: "Fase ${i} - Arco Dramático de ${protagonist}"
+- **Objetivo Narrativo:** Desplegar el nivel ${i} de la transformación de la pobreza al éxito.
+- **Vestuario Asignado a ${protagonist}:** ${i <= 2 ? characterList[0].wardrobeStart : characterList[0].wardrobeEnd}.
+- **Conflicto Clave:** ${i === 1 ? 'Superación de escasez extrema.' : i === 2 ? 'Creación del primer prototipo digital.' : i === 3 ? 'Traición de inversionistas corporativos.' : 'Consolidación del imperio tecnológico.'}
+- **Gancho Final de Continuidad:** Escena de cierre que conecta con el inicio del capítulo ${i + 1 <= episodesCount ? i + 1 : 'final'}.
 `;
     }
     return breakdown;
   }
 
-  function generateFullScriptText(episodesCount, title, characterList, inputs) {
+  function generateFullScriptTextV2(episodesCount, title, characterList) {
     let fullScript = '';
     const protagonist = characterList[0]?.name || 'CARLOS';
     const antagonist = characterList[1]?.name || 'ROBERTO';
@@ -491,27 +709,25 @@ ${generateAudioScript(episodes, characterList, inputs)}
     for (let ep = 1; ep <= episodesCount; ep++) {
       fullScript += `
 ================================================================================
-CAPÍTULO ${ep}: "FASE NARRATIVA ${ep}"
+CAPÍTULO ${ep}: "DESARROLLO DE ESCENA ${ep}"
 ================================================================================
 
-ESCENA 1. INT. HABITACIÓN / LOCAL - NOCHE
+ESCENA 1. INT. HABITACIÓN / OFICINA - NOCHE
 
-La luz tenue de una lámpara ilumina el rostro exhausto de ${protagonist.toUpperCase()}.
-Sobre la mesa, una laptop antigua muestra líneas de código compilar.
+[CONTINUITY NOTE: ${protagonist.toUpperCase()} viste ${ep <= 2 ? 'ropa humilde azul desgastada' : 'traje de tres piezas de lujo'}]
+
+La luz de la pantalla ilumina el rostro de ${protagonist.toUpperCase()}.
 
 ${protagonist.toUpperCase()}
-(murmurando para sí mismo)
-Un intento más... Esto tiene que funcionar.
-
-De pronto, la puerta se abre de golpe. Entra ${antagonist.toUpperCase()}.
+(firme)
+Cada línea de código que escribo es un paso fuera de la oscuridad.
 
 ${antagonist.toUpperCase()}
-(con tono escéptico)
-¿Sigues perdiendo el tiempo con esos sueños absurdos? El mundo real no perdona a los débiles.
+(entrando en cuadro)
+El mercado no respeta los sueños sin capital, ${protagonist}.
 
 ${protagonist.toUpperCase()}
-(mirada firme, levantándose)
-El mundo real pertenece a los que no se rinden jamás. Observa con atención, porque esto es solo el comienzo.
+El capital se construye con determinación. Observa cómo cambia la historia.
 
 [CORTE A NEGRO]
 
@@ -521,60 +737,36 @@ El mundo real pertenece a los que no se rinden jamás. Observa con atención, po
     return fullScript;
   }
 
-  function generateCameraShotList(episodesCount, characterList, inputs) {
-    const protagonist = characterList[0]?.name || 'Protagonista';
+  function generateCameraShotListV2(episodesCount, characterList, inputs) {
+    const protagonist = characterList[0]?.name || 'Carlos';
     return `
-## SHOT LIST TÉCNICO & PROMPTS PARA RUNWAY GEN-3 / SORA / PIKA:
+## SHOT LIST CINEMATOGRÁFICO v2.0:
 
-### TOMA 1: EXTREME CLOSE-UP (PRIMERÍSIMO PRIMER PLANO)
-- **Sujeto:** Ojos de ${protagonist} reflejando la pantalla digital.
-- **Movimiento de Cámara:** Slow Zoom In (Acercamiento lento).
-- **Prompt Video AI:** 
+### TOMA 1: EXTREME CLOSE-UP (PRIMERÍSIMO PRIMER PLANO DE CONTINUIDAD)
+- **Prompt Video AI (Runway Gen-3 / Sora):**
   \`\`\`text
-  Extreme close-up shot of ${protagonist}'s eyes focused intently on a glowing screen, slow zoom in, dramatic low-key lighting, 35mm anamorphic lens, cinematic depth of field, hyperrealistic --motion 4
+  Extreme close-up shot of ${protagonist}'s face, 35mm lens, intense gaze, cinematic lighting in ${inputs.colorPalette}, photorealistic 8k --motion 3
   \`\`\`
 
-### TOMA 2: MEDIUM DOLLY SHOT (PLANO MEDIO EN MOVIMIENTO)
-- **Sujeto:** ${protagonist} caminando determinado por la calle.
-- **Movimiento de Cámara:** Tracking Dolly Shot a la par del sujeto.
+### TOMA 2: TRACKING DOLLY SHOT (SEGUIMIENTO DE CÁMARA)
 - **Prompt Video AI:**
   \`\`\`text
-  Medium tracking shot of ${protagonist} walking through rain-slicked city streets, moody atmosphere, neon reflections, 50mm lens, 4k 60fps cinematic look --motion 6
-  \`\`\`
-
-### TOMA 3: DRONE ESTABLISHING SHOT (PLANO GENERAL AÉREO)
-- **Sujeto:** Edificio corporativo imponente de noche.
-- **Movimiento de Cámara:** Drone Orbiting Shot (Órbita de drone).
-- **Prompt Video AI:**
-  \`\`\`text
-  Cinematic aerial drone orbiting shot of a futuristic glass skyscraper at dusk, golden and blue hour lighting, hyperrealistic, movie scene --motion 5
+  Tracking dolly shot of ${protagonist} walking through city streets, smooth camera movement, anamorphic lens flare, movie quality --motion 5
   \`\`\`
 `;
   }
 
-  function generateAudioScript(episodesCount, characterList, inputs) {
+  function generateAudioScriptV2(episodesCount, characterList, inputs) {
     const protagonist = characterList[0]?.name || 'Carlos';
     return `
-## GUION DE LOCUCIÓN (VOICEOVER FOR ELEVENLABS):
+## GUION DE LOCUCIÓN Y MÚSICA ELEVENLABS v2.0:
 
-### ETIQUETAS DE VOZ & TIMING DE NARRADOR:
 \`\`\`text
-[soft piano melody fading in...]
+[soft piano melancholic melody...]
 
-NARRADOR (VOZ GRAVE Y INSPIRADORA):
-[thoughtful tone] Muchos piensan que el éxito es cuestión de suerte... [pause 1s] pero la verdadera historia de ${protagonist}... se escribió en las noches más oscuras, cuando nadie más creía en él.
-
-[dramatic swell in music...]
-
-NARRADOR:
-[confident] De la escasez absoluta... a dominar una industria global. Esta es su travesía.
+NARRADOR (VOZ CINEMATOGRÁFICA):
+[thoughtful] De la escasez más profunda... al liderazgo indiscutible. La historia de ${protagonist} demuestra el poder de la perseverancia.
 \`\`\`
-
----
-
-## DIRECCIÓN DE BANDA SONORA (BGM):
-- **Inicio de Episodio:** Melodía de piano solo en tempo lento (60 BPM) que transmite esfuerzo y soledad.
-- **Clímax:** Entrada gradual de violines y percusión épica (120 BPM) marcando el triunfo narrativo.
 `;
   }
 
@@ -645,7 +837,7 @@ NARRADOR:
 
   btnExportQuick.addEventListener('click', async () => {
     if (!generatedData) {
-      alert('Por favor, genera primero un proyecto desde el Asistente de Producción antes de exportar.');
+      alert('Por favor, genera primero un proyecto en el Asistente antes de exportar.');
       return;
     }
 
@@ -653,7 +845,7 @@ NARRADOR:
       const res = await window.electronAPI.exportProductionPackage(generatedData);
       if (res.success) {
         const zipMsg = res.zipPath ? `\n- Archivo ZIP: ${res.zipPath}` : '';
-        if (confirm(`¡Proyecto exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta del proyecto en el Explorador?`)) {
+        if (confirm(`¡Proyecto exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
           window.electronAPI.openFolder(res.folderPath);
         }
       } else {

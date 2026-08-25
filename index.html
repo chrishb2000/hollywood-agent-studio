@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hollywood Agent Studio - Asistente de Producción Audiovisual IA</title>
+  <title>Hollywood Agent Studio v2.0 - Asistente de Producción Audiovisual IA</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Remix Icons / FontAwesome fallback icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,10 +13,13 @@
   <!-- TOP NAVIGATION BAR -->
   <header class="app-header">
     <div class="brand">
+      <button id="btn-toggle-sidebar" class="icon-btn" title="Alternar Sidebar de Proyectos">
+        <i class="fa-solid fa-bars"></i>
+      </button>
       <i class="fa-solid fa-clapperboard logo-icon"></i>
       <div class="brand-text">
         <span class="title">HOLLYWOOD AGENT STUDIO</span>
-        <span class="subtitle">Plataforma de Producción & Post-Producción con IA</span>
+        <span class="subtitle">v2.0 IA Production Suite & Continuidad</span>
       </div>
     </div>
 
@@ -25,7 +28,10 @@
         <i class="fa-solid fa-wand-magic-sparkles"></i> Asistente de Producción
       </button>
       <button class="nav-btn" data-tab="tab-agents">
-        <i class="fa-solid fa-user-gear"></i> Agentes de Hollywood
+        <i class="fa-solid fa-user-gear"></i> Agentes (10)
+      </button>
+      <button class="nav-btn" data-tab="tab-memory">
+        <i class="fa-solid fa-brain"></i> Patrón de Memoria
       </button>
       <button class="nav-btn" data-tab="tab-script">
         <i class="fa-solid fa-scroll"></i> Guiones & Biblia
@@ -39,6 +45,10 @@
     </nav>
 
     <div class="header-actions">
+      <!-- Save Current Project -->
+      <button id="btn-save-project-quick" class="btn btn-secondary" title="Guardar cambios del Proyecto actual">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar
+      </button>
       <!-- Theme Switcher -->
       <button id="btn-theme-toggle" class="icon-btn" title="Alternar Tema Claro / Oscuro">
         <i class="fa-solid fa-moon"></i>
@@ -48,390 +58,481 @@
         <i class="fa-solid fa-gear"></i>
       </button>
       <!-- Export Quick Button -->
-      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Proyecto Completo">
+      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP">
         <i class="fa-solid fa-file-zipper"></i> Exportar ZIP
       </button>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="app-content">
+  <!-- MAIN LAYOUT WITH SIDEBAR & CONTENT -->
+  <div class="main-layout">
 
-    <!-- ==================== TAB 1: ASISTENTE DE PRODUCCIÓN (WIZARD) ==================== -->
-    <section id="tab-wizard" class="tab-pane active">
-      <div class="wizard-container">
-        
-        <div class="wizard-header">
-          <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual</h2>
-          <p>Configura tu producción paso a paso. La red de agentes de Hollywood desarrollará toda la pre-producción, guiones, conceptos visuales, planos de cámara, audio y prompts estructurados.</p>
+    <!-- ==================== LEFT SIDEBAR: PROJECTS MANAGEMENT ==================== -->
+    <aside class="sidebar-projects" id="sidebar-projects">
+      <div class="sidebar-header">
+        <h3><i class="fa-solid fa-folder-open"></i> Mis Proyectos</h3>
+        <button id="btn-new-project" class="btn btn-primary btn-sm" title="Crear Nuevo Proyecto en Blanco">
+          <i class="fa-solid fa-plus"></i> Nuevo
+        </button>
+      </div>
+
+      <div class="sidebar-project-list" id="projects-list-container">
+        <!-- Projects rendered dynamically via renderer.js -->
+        <div class="sidebar-empty-state">
+          <i class="fa-solid fa-film"></i>
+          <p>No hay proyectos guardados. Genera uno nuevo y presiona "Guardar".</p>
         </div>
+      </div>
+    </aside>
 
-        <!-- WIZARD STEPPER INDICATOR -->
-        <div class="wizard-stepper">
-          <div class="step-item active" data-step="1">
-            <span class="step-num">1</span>
-            <span class="step-label">Formato</span>
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <main class="app-content">
+
+      <!-- ==================== TAB 1: ASISTENTE DE PRODUCCIÓN (WIZARD) ==================== -->
+      <section id="tab-wizard" class="tab-pane active">
+        <div class="wizard-container">
+          
+          <div class="wizard-header">
+            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual</h2>
+            <p>Configura tu producción paso a paso. La red de 10 agentes de Hollywood desarrollará toda la pre-producción, guiones, conceptos visuales, vestuario, continuidad y patrón de memoria para la IA.</p>
           </div>
-          <div class="step-line"></div>
-          <div class="step-item" data-step="2">
-            <span class="step-num">2</span>
-            <span class="step-label">Premisa & Guion</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" data-step="3">
-            <span class="step-num">3</span>
-            <span class="step-label">Personajes</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" data-step="4">
-            <span class="step-num">4</span>
-            <span class="step-label">Escenarios</span>
-          </div>
-          <div class="step-line"></div>
-          <div class="step-item" data-step="5">
-            <span class="step-num">5</span>
-            <span class="step-label">Estilo & Sonido</span>
-          </div>
-        </div>
 
-        <!-- WIZARD STEP CARDS CONTAINER -->
-        <div class="wizard-card-body">
-
-          <!-- STEP 1: FORMAT & TYPE -->
-          <div class="wizard-step-content active" id="step-content-1">
-            <h3><i class="fa-solid fa-list-check"></i> ¿Qué deseas producir hoy?</h3>
-            <p class="section-desc">Selecciona la estructura narrativa y el tipo de contenido que deseas desarrollar.</p>
-            
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="project-type"><i class="fa-solid fa-video"></i> Tipo de Producción</label>
-                <select id="project-type" class="form-control">
-                  <option value="Serie Web / TV" selected>Serie Web / TV (Multiepisodio)</option>
-                  <option value="Largometraje / Película">Largometraje / Película Cinematográfica</option>
-                  <option value="Documental">Documental / Reportaje Investigativo</option>
-                  <option value="Shorts / Reels / TikTok">Shorts / Reels / TikTok (Formato Vertical Viral)</option>
-                  <option value="Cortometraje">Cortometraje Creativo</option>
-                  <option value="Comercial / Spot Publicitario">Comercial / Spot Publicitario</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="project-title"><i class="fa-solid fa-heading"></i> Título del Proyecto (Opcional)</label>
-                <input type="text" id="project-title" class="form-control" placeholder="Ej: De la Pobreza a la Cúspide" value="De la Pobreza a la Cúspide">
-              </div>
-
-              <div class="form-group">
-                <label for="episodes-count"><i class="fa-solid fa-layer-group"></i> Número de Capítulos / Partes</label>
-                <input type="number" id="episodes-count" class="form-control" min="1" max="50" value="4">
-              </div>
-
-              <div class="form-group">
-                <label for="episode-duration"><i class="fa-solid fa-stopwatch"></i> Duración Estimada por Capítulo</label>
-                <select id="episode-duration" class="form-control">
-                  <option value="60 segundos (Short/Reel)">60 segundos (Short / Reel / TikTok)</option>
-                  <option value="3 a 5 minutos" selected>3 a 5 minutos (Formato Web / YouTube)</option>
-                  <option value="10 a 15 minutos">10 a 15 minutos (Episodio Medio)</option>
-                  <option value="30 a 45 minutos">30 a 45 minutos (Formato TV / Streaming)</option>
-                  <option value="90+ minutos">90+ minutos (Película Completa)</option>
-                </select>
-              </div>
+          <!-- WIZARD STEPPER INDICATOR -->
+          <div class="wizard-stepper">
+            <div class="step-item active" data-step="1">
+              <span class="step-num">1</span>
+              <span class="step-label">Formato</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="2">
+              <span class="step-num">2</span>
+              <span class="step-label">Premisa & Guion</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="3">
+              <span class="step-num">3</span>
+              <span class="step-label">Personajes</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="4">
+              <span class="step-num">4</span>
+              <span class="step-label">Escenarios</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" data-step="5">
+              <span class="step-num">5</span>
+              <span class="step-label">Estilo & Sonido</span>
             </div>
           </div>
 
-          <!-- STEP 2: STORY PREMISE & PLOT -->
-          <div class="wizard-step-content" id="step-content-2">
-            <h3><i class="fa-solid fa-book-open"></i> Idea General & Premisa Narrativa</h3>
-            <p class="section-desc">Describe la trama principal, el conflicto y la evolución narrativa.</p>
+          <!-- WIZARD STEP CARDS CONTAINER -->
+          <div class="wizard-card-body">
 
-            <div class="form-group">
-              <label for="story-premise"><i class="fa-solid fa-pen-nib"></i> Premisa / Sinopsis de la Historia</label>
-              <textarea id="story-premise" class="form-control" rows="5" placeholder="Ej: Una serie de 4 capítulos que relata la vida de Carlos, un hombre que vive en la extrema pobreza en un barrio humilde. A través de la perseverancia, el aprendizaje autodidacta en tecnología y decisiones estratégicas, logra superar adversidades y construir un imperio tecnológico millonario.">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
-            </div>
+            <!-- STEP 1: FORMAT & TYPE -->
+            <div class="wizard-step-content active" id="step-content-1">
+              <h3><i class="fa-solid fa-list-check"></i> ¿Qué deseas producir hoy?</h3>
+              <p class="section-desc">Selecciona la estructura narrativa y el tipo de contenido que deseas desarrollar.</p>
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="project-type"><i class="fa-solid fa-video"></i> Tipo de Producción</label>
+                  <select id="project-type" class="form-control">
+                    <option value="Serie Web / TV" selected>Serie Web / TV (Multiepisodio)</option>
+                    <option value="Largometraje / Película">Largometraje / Película Cinematográfica</option>
+                    <option value="Documental">Documental / Reportaje Investigativo</option>
+                    <option value="Shorts / Reels / TikTok">Shorts / Reels / TikTok (Formato Vertical Viral)</option>
+                    <option value="Cortometraje">Cortometraje Creativo</option>
+                    <option value="Comercial / Spot Publicitario">Comercial / Spot Publicitario</option>
+                  </select>
+                </div>
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="story-genre"><i class="fa-solid fa-masks-theater"></i> Género Principal</label>
-                <select id="story-genre" class="form-control">
-                  <option value="Drama Motivacional / Superación" selected>Drama Motivacional / Superación</option>
-                  <option value="Thriller / Suspense">Thriller / Suspense</option>
-                  <option value="Ciencia Ficción / Cyberpunk">Ciencia Ficción / Cyberpunk</option>
-                  <option value="Acción & Aventura">Acción & Aventura</option>
-                  <option value="Documental Histórico">Documental Histórico</option>
-                  <option value="Comedia Negra">Comedia Negra</option>
-                </select>
-              </div>
+                <div class="form-group">
+                  <label for="project-title"><i class="fa-solid fa-heading"></i> Título del Proyecto</label>
+                  <input type="text" id="project-title" class="form-control" placeholder="Ej: De la Pobreza a la Cúspide" value="De la Pobreza a la Cúspide">
+                </div>
 
-              <div class="form-group">
-                <label for="narrative-tone"><i class="fa-solid fa-face-smile"></i> Tono Emocional</label>
-                <select id="narrative-tone" class="form-control">
-                  <option value="Inspíralo y Emotivo" selected>Inspirador, Emotivo y Realista</option>
-                  <option value="Oscuro y Tenso">Oscuro, Tenso y Dramático</option>
-                  <option value="Epico y Triunfante">Épico y Triunfante</option>
-                  <option value="Dinámico y Didáctico">Dinámico y Didáctico</option>
-                </select>
-              </div>
-            </div>
-          </div>
+                <div class="form-group">
+                  <label for="episodes-count"><i class="fa-solid fa-layer-group"></i> Número de Capítulos / Partes</label>
+                  <input type="number" id="episodes-count" class="form-control" min="1" max="50" value="4">
+                </div>
 
-          <!-- STEP 3: CHARACTERS -->
-          <div class="wizard-step-content" id="step-content-3">
-            <h3><i class="fa-solid fa-users"></i> Definición de Personajes</h3>
-            <p class="section-desc">Detalla quiénes participarán en la producción para generar prompts de consistencia de rostro y personalidad.</p>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="character-count"><i class="fa-solid fa-user-plus"></i> Cantidad de Personajes Principales</label>
-                <input type="number" id="character-count" class="form-control" min="1" max="10" value="3">
-              </div>
-
-              <div class="form-group">
-                <label for="protagonist-details"><i class="fa-solid fa-user-tie"></i> Protagonista Principal</label>
-                <input type="text" id="protagonist-details" class="form-control" placeholder="Ej: Carlos (32 años, visionario, perseverante, viste ropa sencilla al inicio y traje elegante al final)" value="Carlos (32 años, perseverante, autodidacta de la tecnología)">
+                <div class="form-group">
+                  <label for="episode-duration"><i class="fa-solid fa-stopwatch"></i> Duración Estimada por Capítulo</label>
+                  <select id="episode-duration" class="form-control">
+                    <option value="60 segundos (Short/Reel)">60 segundos (Short / Reel / TikTok)</option>
+                    <option value="3 a 5 minutos" selected>3 a 5 minutos (Formato Web / YouTube)</option>
+                    <option value="10 a 15 minutos">10 a 15 minutos (Episodio Medio)</option>
+                    <option value="30 a 45 minutos">30 a 45 minutos (Formato TV / Streaming)</option>
+                    <option value="90+ minutos">90+ minutos (Película Completa)</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div class="form-group mt-3">
-              <label for="secondary-characters"><i class="fa-solid fa-people-group"></i> Personajes Secundarios / Antagonistas</label>
-              <textarea id="secondary-characters" class="form-control" rows="4" placeholder="Ej: 1. Elena (Mentora y primera inversionista)&#10;2. Roberto (Empresario adinerado que intentó sabotear el negocio de Carlos)&#10;3. Mamá de Carlos (Fuente de inspiración moral)">1. Elena (38 años, empresaria experimentada que se convierte en mentora de Carlos)&#10;2. Roberto (45 años, inversionista sin escrúpulos que intenta arruinar el primer prototipo de Carlos)&#10;3. Lucía (Hermana menor de Carlos, a quien promete sacar de la pobreza)</textarea>
-            </div>
-          </div>
+            <!-- STEP 2: STORY PREMISE & PLOT -->
+            <div class="wizard-step-content" id="step-content-2">
+              <h3><i class="fa-solid fa-book-open"></i> Idea General & Premisa Narrativa</h3>
+              <p class="section-desc">Describe la trama principal, el conflicto y la evolución narrativa.</p>
 
-          <!-- STEP 4: SCENARIOS & LOCATIONS -->
-          <div class="wizard-step-content" id="step-content-4">
-            <h3><i class="fa-solid fa-mountain-city"></i> Escenarios, Ubicaciones & Iluminación</h3>
-            <p class="section-desc">Define los entornos donde transcurrirá la acción para generar conceptos de fondo e iluminación.</p>
-
-            <div class="form-group">
-              <label for="key-locations"><i class="fa-solid fa-location-dot"></i> Ubicaciones Clave de la Historia</label>
-              <textarea id="key-locations" class="form-control" rows="4" placeholder="Ej: 1. Pequeño cuarto humilde con una laptop antigua y luz tenue.&#10;2. Cafetería concurrida donde Carlos trabaja en sus proyectos.&#10;3. Oficina moderna de Silicon Valley con ventanales altos y luz dorada.&#10;4. Salón de conferencias de la cumbre tecnológica mundial.">1. Pequeña habitación humilde con una laptop usada, paredes desgastadas y luz de lámpara cálida.&#10;2. Garaje improvisado convertido en laboratorio de código.&#10;3. Edificio corporativo de alta tecnología con arquitectura de cristal y vista panorámica a la ciudad.&#10;4. Auditorio internacional de premiación empresarial.</textarea>
-            </div>
-
-            <div class="form-grid">
               <div class="form-group">
-                <label for="visual-era"><i class="fa-solid fa-clock"></i> Época & Ambientación</label>
-                <select id="visual-era" class="form-control">
-                  <option value="Época Contemporánea / Actual" selected>Época Contemporánea / Actual (Año 2026)</option>
-                  <option value="Futurista / Ciberpunk">Futurista / Ciberpunk</option>
-                  <option value="Retro Años 90">Retro Años 90</option>
-                  <option value="Años 80 Neón">Años 80 Neón</option>
-                </select>
+                <label for="story-premise"><i class="fa-solid fa-pen-nib"></i> Premisa / Sinopsis de la Historia</label>
+                <textarea id="story-premise" class="form-control" rows="5" placeholder="Ej: Serie de 4 capítulos sobre un hombre que convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
               </div>
 
-              <div class="form-group">
-                <label for="color-palette"><i class="fa-solid fa-palette"></i> Paleta de Colores & Iluminación</label>
-                <input type="text" id="color-palette" class="form-control" placeholder="Ej: Tonos fríos/descoloridos al inicio -> Tonos cálidos y dorados cinematográficos al final" value="Tonalidades azules frías al inicio (pobreza) evoluciona a tonos dorados ambarinos de alto contraste (éxito)">
-              </div>
-            </div>
-          </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="story-genre"><i class="fa-solid fa-masks-theater"></i> Género Principal</label>
+                  <select id="story-genre" class="form-control">
+                    <option value="Drama Motivacional / Superación" selected>Drama Motivacional / Superación</option>
+                    <option value="Thriller / Suspense">Thriller / Suspense</option>
+                    <option value="Ciencia Ficción / Cyberpunk">Ciencia Ficción / Cyberpunk</option>
+                    <option value="Acción & Aventura">Acción & Aventura</option>
+                    <option value="Documental Histórico">Documental Histórico</option>
+                    <option value="Comedia Negra">Comedia Negra</option>
+                  </select>
+                </div>
 
-          <!-- STEP 5: STYLE, CAMERA & AUDIO -->
-          <div class="wizard-step-content" id="step-content-5">
-            <h3><i class="fa-solid fa-sliders"></i> Estilo Visual, Dirección de Cámara & Audio</h3>
-            <p class="section-desc">Establece las directrices técnicas para los generadores de video (Sora, Runway Gen-3, Pika, Midjourney, ElevenLabs).</p>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="art-style"><i class="fa-solid fa-wand-magic"></i> Estilo de Render / Arte Visual</label>
-                <select id="art-style" class="form-control">
-                  <option value="Fotorrealista Cinematográfico (35mm Anamórfico)" selected>Fotorrealista Cinematográfico (35mm Anamórfico, Arri Alexa)</option>
-                  <option value="Estilo Película 8K Hyperrealistic">Estilo Película 8K Hyperrealistic</option>
-                  <option value="Estilo Anime 3D / Unreal Engine 5">Estilo Anime 3D / Unreal Engine 5</option>
-                  <option value="Estilo Documental Nat Geo">Estilo Documental Nat Geo</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="camera-style"><i class="fa-solid fa-camera"></i> Estilo de Movimiento de Cámara</label>
-                <select id="camera-style" class="form-control">
-                  <option value="Movimientos Dinámicos (Dolly, Steadicam, Drone Shots)" selected>Movimientos Dinámicos (Dolly, Steadicam, Drone Shots)</option>
-                  <option value="Planos Fijos y Elegantes">Planos Fijos y Elegantes</option>
-                  <option value="Cámara en Mano Estilo Documental">Cámara en Mano Estilo Documental</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="voiceover-style"><i class="fa-solid fa-microphone"></i> Estilo de Locución / Voz (Voiceover)</label>
-                <select id="voiceover-style" class="form-control">
-                  <option value="Voz Masculina Grave y Profunda (Narrador Hollywood)" selected>Voz Masculina Grave y Profunda (Narrador Hollywood)</option>
-                  <option value="Voz Femenina Cálida y Persuasiva">Voz Femenina Cálida y Persuasiva</option>
-                  <option value="Sin Narrador (Solo Diálogos de Personajes)">Sin Narrador (Solo Diálogos de Personajes)</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="music-style"><i class="fa-solid fa-music"></i> Estilo Musical & Efectos de Sonido</label>
-                <input type="text" id="music-style" class="form-control" placeholder="Ej: Piano melancólico inicial -> Orquesta crescendo épica" value="Piano melancólico y sintetizador suave que crece hacia una sinfonía orquestal motivacional">
+                <div class="form-group">
+                  <label for="narrative-tone"><i class="fa-solid fa-face-smile"></i> Tono Emocional</label>
+                  <select id="narrative-tone" class="form-control">
+                    <option value="Inspíralo y Emotivo" selected>Inspirador, Emotivo y Realista</option>
+                    <option value="Oscuro y Tenso">Oscuro, Tenso y Dramático</option>
+                    <option value="Epico y Triunfante">Épico y Triunfante</option>
+                    <option value="Dinámico y Didáctico">Dinámico y Didáctico</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <!-- GENERATE BUTTON -->
-            <div class="generate-box mt-4 text-center">
-              <button id="btn-run-generation" class="btn btn-primary btn-xl">
-                <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN COMPLETA CON RED DE AGENTES IA
-              </button>
-              <p class="small-hint">La IA ejecutará a los agentes de Hollywood: Guionista, Director, Director de Fotografía, Diseñador de Concepto, Diseñador de Sonido y Arquitecto de Prompts.</p>
+            <!-- STEP 3: CHARACTERS -->
+            <div class="wizard-step-content" id="step-content-3">
+              <h3><i class="fa-solid fa-users"></i> Definición de Personajes</h3>
+              <p class="section-desc">Detalla quiénes participarán en la producción para generar prompts de consistencia de rostro, vestuario y personalidad.</p>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="character-count"><i class="fa-solid fa-user-plus"></i> Cantidad de Personajes Principales</label>
+                  <input type="number" id="character-count" class="form-control" min="1" max="10" value="3">
+                </div>
+
+                <div class="form-group">
+                  <label for="protagonist-details"><i class="fa-solid fa-user-tie"></i> Protagonista Principal</label>
+                  <input type="text" id="protagonist-details" class="form-control" placeholder="Ej: Carlos (32 años, perseverante...)" value="Carlos (32 años, perseverante, autodidacta de la tecnología)">
+                </div>
+              </div>
+
+              <div class="form-group mt-3">
+                <label for="secondary-characters"><i class="fa-solid fa-people-group"></i> Personajes Secundarios / Antagonistas</label>
+                <textarea id="secondary-characters" class="form-control" rows="4" placeholder="Ej: 1. Elena (Mentora)...">1. Elena (38 años, empresaria experimentada que se convierte en mentora de Carlos)&#10;2. Roberto (45 años, inversionista sin escrúpulos que intenta arruinar el primer prototipo de Carlos)&#10;3. Lucía (Hermana menor de Carlos, a quien promete sacar de la pobreza)</textarea>
+              </div>
+            </div>
+
+            <!-- STEP 4: SCENARIOS & LOCATIONS -->
+            <div class="wizard-step-content" id="step-content-4">
+              <h3><i class="fa-solid fa-mountain-city"></i> Escenarios, Ubicaciones & Iluminación</h3>
+              <p class="section-desc">Define los entornos donde transcurrirá la acción para generar conceptos de fondo e iluminación.</p>
+
+              <div class="form-group">
+                <label for="key-locations"><i class="fa-solid fa-location-dot"></i> Ubicaciones Clave de la Historia</label>
+                <textarea id="key-locations" class="form-control" rows="4" placeholder="Ej: 1. Pequeño cuarto humilde...">1. Pequeña habitación humilde con una laptop usada, paredes desgastadas y luz de lámpara cálida.&#10;2. Garaje improvisado convertido en laboratorio de código.&#10;3. Edificio corporativo de alta tecnología con arquitectura de cristal y vista panorámica a la ciudad.&#10;4. Auditorio internacional de premiación empresarial.</textarea>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="visual-era"><i class="fa-solid fa-clock"></i> Época & Ambientación</label>
+                  <select id="visual-era" class="form-control">
+                    <option value="Época Contemporánea / Actual" selected>Época Contemporánea / Actual (Año 2026)</option>
+                    <option value="Futurista / Ciberpunk">Futurista / Ciberpunk</option>
+                    <option value="Retro Años 90">Retro Años 90</option>
+                    <option value="Años 80 Neón">Años 80 Neón</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="color-palette"><i class="fa-solid fa-palette"></i> Paleta de Colores & Iluminación</label>
+                  <input type="text" id="color-palette" class="form-control" placeholder="Ej: Azules fríos iniciales -> Dorados cinematográficos" value="Tonalidades azules frías al inicio (pobreza) evoluciona a tonos dorados ambarinos de alto contraste (éxito)">
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 5: STYLE, CAMERA & AUDIO -->
+            <div class="wizard-step-content" id="step-content-5">
+              <h3><i class="fa-solid fa-sliders"></i> Estilo Visual, Dirección de Cámara & Audio</h3>
+              <p class="section-desc">Establece las directrices técnicas para los generadores de video (Sora, Runway Gen-3, Pika, Midjourney, ElevenLabs).</p>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="art-style"><i class="fa-solid fa-wand-magic"></i> Estilo de Render / Arte Visual</label>
+                  <select id="art-style" class="form-control">
+                    <option value="Fotorrealista Cinematográfico (35mm Anamórfico)" selected>Fotorrealista Cinematográfico (35mm Anamórfico, Arri Alexa)</option>
+                    <option value="Estilo Película 8K Hyperrealistic">Estilo Película 8K Hyperrealistic</option>
+                    <option value="Estilo Anime 3D / Unreal Engine 5">Estilo Anime 3D / Unreal Engine 5</option>
+                    <option value="Estilo Documental Nat Geo">Estilo Documental Nat Geo</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="camera-style"><i class="fa-solid fa-camera"></i> Estilo de Movimiento de Cámara</label>
+                  <select id="camera-style" class="form-control">
+                    <option value="Movimientos Dinámicos (Dolly, Steadicam, Drone Shots)" selected>Movimientos Dinámicos (Dolly, Steadicam, Drone Shots)</option>
+                    <option value="Planos Fijos y Elegantes">Planos Fijos y Elegantes</option>
+                    <option value="Cámara en Mano Estilo Documental">Cámara en Mano Estilo Documental</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="voiceover-style"><i class="fa-solid fa-microphone"></i> Estilo de Locución / Voz (Voiceover)</label>
+                  <select id="voiceover-style" class="form-control">
+                    <option value="Voz Masculina Grave y Profunda (Narrador Hollywood)" selected>Voz Masculina Grave y Profunda (Narrador Hollywood)</option>
+                    <option value="Voz Femenina Cálida y Persuasiva">Voz Femenina Cálida y Persuasiva</option>
+                    <option value="Sin Narrador (Solo Diálogos de Personajes)">Sin Narrador (Solo Diálogos de Personajes)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="music-style"><i class="fa-solid fa-music"></i> Estilo Musical & Efectos de Sonido</label>
+                  <input type="text" id="music-style" class="form-control" placeholder="Ej: Piano melancólico inicial -> Orquesta crescendo épica" value="Piano melancólico y sintetizador suave que crece hacia una sinfonía orquestal motivacional">
+                </div>
+              </div>
+
+              <!-- GENERATE BUTTON -->
+              <div class="generate-box mt-4 text-center">
+                <button id="btn-run-generation" class="btn btn-primary btn-xl">
+                  <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN COMPLETA (10 AGENTES IA + PATRÓN MEMORIA)
+                </button>
+                <p class="small-hint">La IA ejecutará a los 10 agentes de Hollywood: Director Master, Script Supervisor de Continuidad, Guionista, Fotografía, Vestuario, Arte, Sonido, Colorista y Arquitecto de Memoria.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- WIZARD FOOTER NAVIGATION BUTTONS -->
+          <div class="wizard-footer">
+            <button id="btn-wizard-prev" class="btn btn-secondary" disabled>
+              <i class="fa-solid fa-chevron-left"></i> Anterior
+            </button>
+            <button id="btn-wizard-next" class="btn btn-primary">
+              Siguiente <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 2: RED DE 10 AGENTES DE HOLLYWOOD ==================== -->
+      <section id="tab-agents" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-user-gear"></i> Red Completa de 10 Agentes Especializados de Hollywood</h2>
+          <p>Orquestación autónoma liderada por el Director Master para mantener coherencia técnica y narrativa absoluta.</p>
+        </div>
+
+        <div class="agents-grid">
+          
+          <!-- Agent 1 -->
+          <div class="agent-card highlight-master">
+            <div class="agent-avatar"><i class="fa-solid fa-crown"></i></div>
+            <div class="agent-info">
+              <h3>1. Director Master & Orquestador</h3>
+              <span class="agent-role">Líder Supremo de Producción</span>
+              <p>Mantiene la visión unificada del proyecto, el ritmo cinemático y garantiza el patrón de memoria continuada en todo el metraje.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 2 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-clipboard-check"></i></div>
+            <div class="agent-info">
+              <h3>2. Script Supervisor (Continuidad)</h3>
+              <span class="agent-role">Supervisión de Coherencia</span>
+              <p>Evita fallos de continuidad en atrezzo, posición de objetos, iluminación de escenas y peinados entre planos.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 3 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-feather-pointed"></i></div>
+            <div class="agent-info">
+              <h3>3. Guionista Principal (Screenwriter)</h3>
+              <span class="agent-role">Escritura de Guiones & Diálogos</span>
+              <p>Redacta diálogos en formato Hollywood, arcos dramáticos, conflicto en 3 actos y ganchos finales (cliffhangers).</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 4 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-video"></i></div>
+            <div class="agent-info">
+              <h3>4. Director de Fotografía (Cinematographer)</h3>
+              <span class="agent-role">Planos, Lentes & Iluminación</span>
+              <p>Diseña el shot list completo: lentes anamórficos, movimientos de cámara, ángulos y prompts para Sora/Runway/Pika.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 5 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="agent-info">
+              <h3>5. Director de Arte & Escenarios</h3>
+              <span class="agent-role">Diseño de Producción & Atrezzo</span>
+              <p>Crea la arquitectura de sets, ambientación de época, utilería clave y paletas de color por escenario.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 6 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-shirt"></i></div>
+            <div class="agent-info">
+              <h3>6. Especialista de Vestuario & Styling</h3>
+              <span class="agent-role">Consistencia de Indumentaria</span>
+              <p>Define fichas de vestuario exactas por personaje según la evolución económica y psicológica en la historia.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 7 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-paintbrush"></i></div>
+            <div class="agent-info">
+              <h3>7. Diseñador de Concepto & Rostros</h3>
+              <span class="agent-role">Prompts de Consistencia Visual</span>
+              <p>Genera prompts matriciales con identificadores fijos ([CHAR_ID]) para Midjourney v6, Flux.1 y DALL-E 3.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 8 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-headphones"></i></div>
+            <div class="agent-info">
+              <h3>8. Ingeniero de Sonido & Locución</h3>
+              <span class="agent-role">Voiceover & BGM Soundscapes</span>
+              <p>Formatea guiones para síntesis de voz ElevenLabs con marcas de tono, pausas, efectos Foley y bandas sonoras.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 9 -->
+          <div class="agent-card">
+            <div class="agent-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <div class="agent-info">
+              <h3>9. Colorista & Director de Post-Producción</h3>
+              <span class="agent-role">LUTs & Color Grading</span>
+              <p>Define el estilo de etalonaje digital (Color Grading), LUTs, grano de película 35mm y ritmo de montaje.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
+            </div>
+          </div>
+
+          <!-- Agent 10 -->
+          <div class="agent-card highlight-memory">
+            <div class="agent-avatar"><i class="fa-solid fa-terminal"></i></div>
+            <div class="agent-info">
+              <h3>10. Arquitecto de Memoria Continuada</h3>
+              <span class="agent-role">Memoria Persistente para IAs</span>
+              <p>Construye el patrón de memoria (`00_SYSTEM_MEMORY_PATTERN.md`) con reglas y tokens que la IA no olvida.</p>
+              <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
             </div>
           </div>
 
         </div>
-
-        <!-- WIZARD FOOTER NAVIGATION BUTTONS -->
-        <div class="wizard-footer">
-          <button id="btn-wizard-prev" class="btn btn-secondary" disabled>
-            <i class="fa-solid fa-chevron-left"></i> Anterior
-          </button>
-          <button id="btn-wizard-next" class="btn btn-primary">
-            Siguiente <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
-
-      </div>
-    </section>
+      </section>
 
 
-    <!-- ==================== TAB 2: RED DE AGENTES DE HOLLYWOOD ==================== -->
-    <section id="tab-agents" class="tab-pane">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-user-gear"></i> Red de Agentes de Producción de Hollywood</h2>
-        <p>Los siguientes agentes virtuales colaboran de forma autónoma para armar la documentación de pre y post-producción.</p>
-      </div>
-
-      <div class="agents-grid">
-        
-        <div class="agent-card">
-          <div class="agent-avatar"><i class="fa-solid fa-crown"></i></div>
-          <div class="agent-info">
-            <h3>Director Ejecutivo & Productor</h3>
-            <span class="agent-role">Líder de Proyecto & Estrategia</span>
-            <p>Supervisa la biblia de producción, controla la coherencia temática y coordina a todo el equipo creativo.</p>
-            <div class="agent-status active"><i class="fa-solid fa-circle"></i> Listo para Orquestar</div>
+      <!-- ==================== TAB 3: PATRÓN DE MEMORIA CONTINUADA ==================== -->
+      <section id="tab-memory" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-brain"></i> Patrón de Memoria Continuada para IAs</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-memory"><i class="fa-regular fa-copy"></i> Copiar Memoria</button>
           </div>
         </div>
 
-        <div class="agent-card">
-          <div class="agent-avatar"><i class="fa-solid fa-feather-pointed"></i></div>
-          <div class="agent-info">
-            <h3>Guionista Principal (Screenwriter)</h3>
-            <span class="agent-role">Escritura de Guiones & Diálogos</span>
-            <p>Redacta el desarrollo capítulo por capítulo, conflictos, diálogos realistas y la estructura en 3 actos.</p>
-            <div class="agent-status active"><i class="fa-solid fa-circle"></i> Listo para Orquestar</div>
+        <div class="editor-container">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-lock"></i> Reglas de memoria fija, tokens de consistencia y contexto para ChatGPT / Claude / Gemini / Ollama</span>
+          </div>
+          <textarea id="output-memory" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver el Patrón de Memoria Continuada aquí..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 4: GUIONES & BIBLIA DEL PROYECTO ==================== -->
+      <section id="tab-script" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-scroll"></i> Biblia de Producción & Guiones Desglosados</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-script"><i class="fa-regular fa-copy"></i> Copiar Guiones</button>
           </div>
         </div>
 
-        <div class="agent-card">
-          <div class="agent-avatar"><i class="fa-solid fa-video"></i></div>
-          <div class="agent-info">
-            <h3>Director de Fotografía (Cinematographer)</h3>
-            <span class="agent-role">Planos, Lentes & Iluminación</span>
-            <p>Diseña el shot list completo: lentes focal, movimientos de cámara, ángulos y prompts para Sora/Runway/Pika.</p>
-            <div class="agent-status active"><i class="fa-solid fa-circle"></i> Listo para Orquestar</div>
+        <div class="editor-container">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-film"></i> Guion cinematográfico completo por episodios</span>
+          </div>
+          <textarea id="output-script" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver la Biblia y Guiones desglosados aquí..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 5: PERSONAJES & ESCENARIOS ==================== -->
+      <section id="tab-characters" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-users-viewfinder"></i> Fichas de Personajes & Escenarios</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-characters"><i class="fa-regular fa-copy"></i> Copiar Fichas</button>
           </div>
         </div>
 
-        <div class="agent-card">
-          <div class="agent-avatar"><i class="fa-solid fa-paintbrush"></i></div>
-          <div class="agent-info">
-            <h3>Diseñador de Concepto & Avatares</h3>
-            <span class="agent-role">Arte Visual & Consistencia</span>
-            <p>Genera especificaciones técnicas de personajes y escenarios con prompts para Midjourney, Flux y DALL-E 3.</p>
-            <div class="agent-status active"><i class="fa-solid fa-circle"></i> Listo para Orquestar</div>
+        <!-- VISUAL AVATAR PREVIEW CANVAS GENERATOR -->
+        <div class="avatar-preview-section">
+          <h3><i class="fa-solid fa-id-card"></i> Vista Previa de Avatares & Referencias Visuales Generadas</h3>
+          <div class="avatar-cards-row" id="avatar-cards-container">
+            <div class="avatar-placeholder-box">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <p>Haz clic en "Generar Producción Completa" para construir las tarjetas visuales de tus personajes y escenarios.</p>
+            </div>
           </div>
         </div>
 
-        <div class="agent-card">
-          <div class="agent-avatar"><i class="fa-solid fa-headphones"></i></div>
-          <div class="agent-info">
-            <h3>Ingeniero de Sonido & Locución</h3>
-            <span class="agent-role">Voiceover & BGM Soundscapes</span>
-            <p>Formatea guiones para sintesis de voz ElevenLabs con marcas temporales, tono de locución y pistas musicales.</p>
-            <div class="agent-status active"><i class="fa-solid fa-circle"></i> Listo para Orquestar</div>
+        <div class="editor-container mt-3">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-paint-roller"></i> Dossier técnico de consistencia visual & vestuario (Midjourney / Flux / DALL-E 3)</span>
+          </div>
+          <textarea id="output-characters" class="code-editor" readonly placeholder="Dossier de personajes, vestuario y conceptos visuales..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 6: PLANOS DE CÁMARA & AUDIO ==================== -->
+      <section id="tab-camera-audio" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-video"></i> Planos de Cámara, Storyboard & Guía de Sonido</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-camera"><i class="fa-regular fa-copy"></i> Copiar Especificaciones</button>
           </div>
         </div>
 
-        <div class="agent-card">
-          <div class="agent-avatar"><i class="fa-solid fa-terminal"></i></div>
-          <div class="agent-info">
-            <h3>Arquitecto de Prompts, Skills & Rules</h3>
-            <span class="agent-role">Ingeniería de Prompts para IA</span>
-            <p>Empaqueta todos los agentes, skills y reglas en formatos modulares compatibles con ChatGPT, Claude, Gemini y Ollama.</p>
-            <div class="agent-status active"><i class="fa-solid fa-circle"></i> Listo para Orquestar</div>
+        <div class="two-column-editors">
+          <div class="editor-box">
+            <h3><i class="fa-solid fa-camera-retro"></i> Shot List & Planos de Cámara (Runway / Sora / Pika)</h3>
+            <textarea id="output-camera" class="code-editor" readonly placeholder="Especificaciones de ángulos, lentes y movimiento de cámara..."></textarea>
+          </div>
+
+          <div class="editor-box">
+            <h3><i class="fa-solid fa-file-audio"></i> Pautas de Locución (ElevenLabs) & Música</h3>
+            <textarea id="output-audio" class="code-editor" readonly placeholder="Guion con marcas de voz, entonaciones y efectos de sonido..."></textarea>
           </div>
         </div>
+      </section>
 
-      </div>
-    </section>
+    </main>
 
-
-    <!-- ==================== TAB 3: GUIONES & BIBLIA DEL PROYECTO ==================== -->
-    <section id="tab-script" class="tab-pane">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-scroll"></i> Biblia de Producción & Guiones Desglosados</h2>
-        <div class="actions">
-          <button class="btn btn-secondary btn-copy" data-target="output-script"><i class="fa-regular fa-copy"></i> Copiar Guiones</button>
-        </div>
-      </div>
-
-      <div class="editor-container">
-        <div class="output-header">
-          <span class="badge"><i class="fa-solid fa-film"></i> Guion cinematográfico completo por episodios</span>
-        </div>
-        <textarea id="output-script" class="code-editor" readonly placeholder="Genera primero tu proyecto desde el Asistente para ver la Biblia del Proyecto y los Guiones desglosados aquí..."></textarea>
-      </div>
-    </section>
-
-
-    <!-- ==================== TAB 4: PERSONAJES & ESCENARIOS ==================== -->
-    <section id="tab-characters" class="tab-pane">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-users-viewfinder"></i> Fichas de Personajes & Escenarios</h2>
-        <div class="actions">
-          <button class="btn btn-secondary btn-copy" data-target="output-characters"><i class="fa-regular fa-copy"></i> Copiar Fichas</button>
-        </div>
-      </div>
-
-      <!-- VISUAL AVATAR PREVIEW CANVAS GENERATOR -->
-      <div class="avatar-preview-section">
-        <h3><i class="fa-solid fa-id-card"></i> Vista Previa de Avatares & Referencias Visuales Generadas</h3>
-        <div class="avatar-cards-row" id="avatar-cards-container">
-          <div class="avatar-placeholder-box">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <p>Haz clic en "Generar Producción Completa" para construir las tarjetas visuales de tus personajes y escenarios.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="editor-container mt-3">
-        <div class="output-header">
-          <span class="badge"><i class="fa-solid fa-paint-roller"></i> Dossier técnico de consistencia visual (Midjourney / Flux / DALL-E 3)</span>
-        </div>
-        <textarea id="output-characters" class="code-editor" readonly placeholder="Dossier de personajes y conceptos visuales..."></textarea>
-      </div>
-    </section>
-
-
-    <!-- ==================== TAB 5: PLANOS DE CÁMARA & AUDIO ==================== -->
-    <section id="tab-camera-audio" class="tab-pane">
-      <div class="section-header">
-        <h2><i class="fa-solid fa-video"></i> Planos de Cámara, Storyboard & Guía de Sonido</h2>
-        <div class="actions">
-          <button class="btn btn-secondary btn-copy" data-target="output-camera"><i class="fa-regular fa-copy"></i> Copiar Especificaciones</button>
-        </div>
-      </div>
-
-      <div class="two-column-editors">
-        <div class="editor-box">
-          <h3><i class="fa-solid fa-camera-retro"></i> Shot List & Planos de Cámara (Runway / Sora / Pika)</h3>
-          <textarea id="output-camera" class="code-editor" readonly placeholder="Especificaciones de ángulos, lentes y movimiento de cámara..."></textarea>
-        </div>
-
-        <div class="editor-box">
-          <h3><i class="fa-solid fa-file-audio"></i> Pautas de Locución (ElevenLabs) & Música</h3>
-          <textarea id="output-audio" class="code-editor" readonly placeholder="Guion con marcas de voz, entonaciones y efectos de sonido..."></textarea>
-        </div>
-      </div>
-    </section>
-
-  </main>
+  </div>
 
   <!-- ==================== SETTINGS MODAL ==================== -->
   <div id="settings-modal" class="modal-overlay">
@@ -498,7 +599,7 @@
   <!-- ==================== FOOTER & CREDITS BAR ==================== -->
   <footer class="app-footer">
     <div class="footer-left">
-      <span>Hollywood Agent Studio v1.0.0 &copy; 2026</span>
+      <span>Hollywood Agent Studio v2.0 &copy; 2026</span>
       <span class="dot-separator">•</span>
       <span>Desarrollado por <strong><a href="https://christian-freelance.us/" target="_blank" class="credit-link">Christian Herencia</a></strong></span>
     </div>
