@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO v3.5 PRO SUITE - RENDERER SCRIPT WITH LIVE TESTERS
+   HOLLYWOOD AGENT STUDIO v4.0 PRO SUITE - RENDERER SCRIPT
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let generatedData = null;
   let savedProjects = [];
   let currentProjectId = null;
+  let episodesSubsectionsData = [];
 
   let appSettings = {
     provider: 'ollama',
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebarProjects = document.getElementById('sidebar-projects');
   const btnNewProject = document.getElementById('btn-new-project');
   const btnSaveProjectQuick = document.getElementById('btn-save-project-quick');
+  const btnSaveProjectFinal = document.getElementById('btn-save-project-final');
   const projectsListContainer = document.getElementById('projects-list-container');
 
   if (btnToggleSidebar && sidebarProjects) {
@@ -119,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getWizardFormData() {
+    collectEpisodeSubsectionsData();
     return {
       projectType: document.getElementById('project-type').value,
       projectTitle: document.getElementById('project-title').value.trim() || 'Producción Audiovisual',
@@ -136,19 +139,22 @@ document.addEventListener('DOMContentLoaded', () => {
       cameraStyle: document.getElementById('camera-style').value,
       voiceoverStyle: document.getElementById('voiceover-style').value,
       musicStyle: document.getElementById('music-style').value,
-      // Textarea References v3.5
       formatReferences: document.getElementById('format-references') ? document.getElementById('format-references').value : '',
       plotReferences: document.getElementById('plot-references') ? document.getElementById('plot-references').value : '',
       characterReferences: document.getElementById('character-references') ? document.getElementById('character-references').value : '',
       scenarioReferences: document.getElementById('scenario-references') ? document.getElementById('scenario-references').value : '',
-      styleAudioReferences: document.getElementById('style-audio-references') ? document.getElementById('style-audio-references').value : ''
+      styleAudioReferences: document.getElementById('style-audio-references') ? document.getElementById('style-audio-references').value : '',
+      episodesSubsections: episodesSubsectionsData
     };
   }
 
   function setWizardFormData(data) {
     if (data.projectType) document.getElementById('project-type').value = data.projectType;
     if (data.projectTitle) document.getElementById('project-title').value = data.projectTitle;
-    if (data.episodesCount) document.getElementById('episodes-count').value = data.episodesCount;
+    if (data.episodesCount) {
+      document.getElementById('episodes-count').value = data.episodesCount;
+      renderEpisodeSubsections(data.episodesCount, data.episodesSubsections);
+    }
     if (data.episodeDuration) document.getElementById('episode-duration').value = data.episodeDuration;
     if (data.storyPremise) document.getElementById('story-premise').value = data.storyPremise;
     if (data.storyGenre) document.getElementById('story-genre').value = data.storyGenre;
@@ -193,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     saveProjectsToStorage();
-    alert(`Proyecto "${formData.projectTitle}" guardado correctamente.`);
+    alert(`Proyecto "${formData.projectTitle}" guardado correctamente en tu biblioteca.`);
   }
 
   function loadProjectIntoUI(proj) {
@@ -254,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
       plotReferences: '',
       characterReferences: '',
       scenarioReferences: '',
-      styleAudioReferences: ''
+      styleAudioReferences: '',
+      episodesSubsections: []
     });
 
     document.getElementById('output-memory').value = '';
@@ -284,6 +291,139 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnNewProject) btnNewProject.addEventListener('click', createNewProject);
   if (btnSaveProjectQuick) btnSaveProjectQuick.addEventListener('click', saveCurrentProjectState);
+  if (btnSaveProjectFinal) btnSaveProjectFinal.addEventListener('click', saveCurrentProjectState);
+
+  /* ==========================================
+     DYNAMIC EPISODE SUBSECTIONS GENERATOR v4.0
+     ========================================== */
+  const episodesCountInput = document.getElementById('episodes-count');
+
+  if (episodesCountInput) {
+    episodesCountInput.addEventListener('change', () => {
+      const count = parseInt(episodesCountInput.value) || 4;
+      renderEpisodeSubsections(count);
+    });
+  }
+
+  function renderEpisodeSubsections(count, existingData = null) {
+    const container = document.getElementById('episodes-subsections-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const defaultNames = [
+      'El Origen y la Tormenta Inicial',
+      'La Chispas del Descubrimiento',
+      'Traiciones y la Gran Prueba de Fuego',
+      'La Cumbre y el Imperio Recobrado',
+      'Expandiendo Horizontes',
+      'El Legado Final'
+    ];
+
+    for (let i = 1; i <= count; i++) {
+      const card = document.createElement('div');
+      card.className = 'episode-card-subsection';
+
+      const savedEp = existingData && existingData[i - 1] ? existingData[i - 1] : null;
+      const defaultTitle = savedEp?.title || defaultNames[i - 1] || `Capítulo ${i}: La Transformación Continúa`;
+      const defaultPlot = savedEp?.plot || `Notas de escena para el Capítulo ${i}: Despliegue de la fase ${i} en la historia del protagonista.`;
+
+      card.innerHTML = `
+        <div class="ep-header">
+          <span class="ep-number-badge"><i class="fa-solid fa-clapperboard"></i> CAPÍTULO ${i}</span>
+          <button class="btn btn-secondary btn-preview-ep-ai" data-ep="${i}">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ Pre-visualizar Borrador con IA
+          </button>
+        </div>
+        <div class="form-group">
+          <label for="ep-title-${i}">Subtítulo / Nombre del Capítulo ${i}</label>
+          <input type="text" id="ep-title-${i}" class="form-control ep-title-input" value="${defaultTitle}">
+        </div>
+        <div class="form-group">
+          <label for="ep-plot-${i}">Desglose de Escenas & Contenido del Capítulo ${i}</label>
+          <textarea id="ep-plot-${i}" class="form-control ep-plot-input" rows="3" placeholder="Añade o edita los detalles clave de este capítulo...">${defaultPlot}</textarea>
+        </div>
+      `;
+
+      const btnAi = card.querySelector('.btn-preview-ep-ai');
+      btnAi.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await previewEpisodeDraftWithAI(i);
+      });
+
+      container.appendChild(card);
+    }
+  }
+
+  function collectEpisodeSubsectionsData() {
+    const container = document.getElementById('episodes-subsections-container');
+    if (!container) return;
+
+    episodesSubsectionsData = [];
+    const cards = container.querySelectorAll('.episode-card-subsection');
+
+    cards.forEach((card, index) => {
+      const epNum = index + 1;
+      const titleEl = card.querySelector(`#ep-title-${epNum}`);
+      const plotEl = card.querySelector(`#ep-plot-${epNum}`);
+
+      episodesSubsectionsData.push({
+        num: epNum,
+        title: titleEl ? titleEl.value : `Capítulo ${epNum}`,
+        plot: plotEl ? plotEl.value : ''
+      });
+    });
+  }
+
+  async function previewEpisodeDraftWithAI(epNum) {
+    const title = document.getElementById('project-title').value || 'Serie';
+    const premise = document.getElementById('story-premise').value || '';
+    const epTitleInput = document.getElementById(`ep-title-${epNum}`);
+    const epPlotInput = document.getElementById(`ep-plot-${epNum}`);
+
+    if (!epPlotInput) return;
+
+    const btnAi = document.querySelector(`.btn-preview-ep-ai[data-ep="${epNum}"]`);
+    if (btnAi) {
+      btnAi.disabled = true;
+      btnAi.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando Borrador...';
+    }
+
+    try {
+      if (appSettings.provider === 'ollama') {
+        const ollamaUrl = appSettings.ollamaUrl || 'http://localhost:11434';
+        const model = appSettings.ollamaModel || 'llama3:latest';
+
+        const promptText = `Escribe un desglose dramático de 3 escenas para el Capítulo ${epNum} ("${epTitleInput ? epTitleInput.value : ''}") de la serie "${title}". Premisa general: ${premise}. Formato conciso en español.`;
+
+        const res = await fetch(`${ollamaUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model, prompt: promptText, stream: false })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          epPlotInput.value = data.response;
+        } else {
+          epPlotInput.value = `[BORRADOR GENERADO CAPÍTULO ${epNum}]\n- Escena 1: Introducción a la fase ${epNum}.\n- Escena 2: Conflicto central.\n- Escena 3: Cierre de alto impacto.`;
+        }
+      } else {
+        epPlotInput.value = `[BORRADOR INTELIGENTE CAPÍTULO ${epNum}]\n- Escena 1 (INT. HABITACIÓN - NOCHE): El protagonista enfrenta el desafío inicial de la fase ${epNum}.\n- Escena 2 (EXT. CIUDAD - DÍA): Encuentro clave con aliados y superación del conflicto.\n- Escena 3 (INT. OFICINA): Decisión estratégica y cliffhanger hacia el siguiente capítulo.`;
+      }
+    } catch (err) {
+      console.warn('AI preview offline fallback:', err);
+      epPlotInput.value = `[BORRADOR INTELIGENTE CAPÍTULO ${epNum}]\n- Escena 1: El protagonista inicia la fase ${epNum} en la historia.\n- Escena 2: Superación de obstáculos.\n- Escena 3: Cierre decisivo.`;
+    } finally {
+      if (btnAi) {
+        btnAi.disabled = false;
+        btnAi.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> ✨ Pre-visualizar Borrador con IA';
+      }
+    }
+  }
+
+  // Initial render of episode subsections
+  renderEpisodeSubsections(4);
 
   /* ==========================================
      NAV TABS SWITCHING
@@ -391,14 +531,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     SETTINGS MODAL & LIVE CONNECTION TESTERS v3.5
+     SETTINGS MODAL EASY CLOSE HANDLERS v4.0
      ========================================== */
   const btnSettings = document.getElementById('btn-settings');
   const modalSettings = document.getElementById('settings-modal');
-  const btnCloseSettings = document.getElementById('btn-close-settings');
+  const btnCloseSettingsX = document.getElementById('btn-close-settings-x');
+  const btnCancelSettings = document.getElementById('btn-cancel-settings');
   const btnSaveSettings = document.getElementById('btn-save-settings');
   const settingsTabButtons = document.querySelectorAll('.settings-tab-btn');
   const settingsSections = document.querySelectorAll('.settings-section');
+
+  function closeModal() {
+    if (modalSettings) modalSettings.classList.remove('active');
+  }
+
+  if (btnCloseSettingsX) btnCloseSettingsX.addEventListener('click', closeModal);
+  if (btnCancelSettings) btnCancelSettings.addEventListener('click', closeModal);
+
+  if (modalSettings) {
+    modalSettings.addEventListener('click', (e) => {
+      if (e.target === modalSettings) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalSettings && modalSettings.classList.contains('active')) {
+      closeModal();
+    }
+  });
 
   settingsTabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -415,10 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
   btnSettings.addEventListener('click', () => {
     applySettingsToUI();
     modalSettings.classList.add('active');
-  });
-
-  btnCloseSettings.addEventListener('click', () => {
-    modalSettings.classList.remove('active');
   });
 
   function applySettingsToUI() {
@@ -455,11 +611,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.electronAPI) {
       window.electronAPI.saveSettings(appSettings).then(() => {
         alert('Todas las conexiones IA han sido guardadas exitosamente.');
-        modalSettings.classList.remove('active');
+        closeModal();
       });
     } else {
       alert('Configuración actualizada.');
-      modalSettings.classList.remove('active');
+      closeModal();
     }
   });
 
@@ -656,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================
-     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v3.5
+     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v4.0
      ========================================== */
   const btnRunGeneration = document.getElementById('btn-run-generation');
 
@@ -668,7 +824,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let aiGeneratedScript = null;
 
-    // Check if Ollama is selected & active to make real HTTP query
     if (appSettings.provider === 'ollama') {
       try {
         const ollamaUrl = appSettings.ollamaUrl || 'http://localhost:11434';
@@ -696,35 +851,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setTimeout(() => {
-      // Build Full Production Output Data v3.5
-      generatedData = buildHollywoodProductionBundleV3(inputs, aiGeneratedScript);
-
-      // Populate UI Outputs
+      generatedData = buildHollywoodProductionBundleV4(inputs, aiGeneratedScript);
       populateGeneratedOutputs(generatedData);
-
-      // Auto save to projects
       saveCurrentProjectState();
 
       btnRunGeneration.disabled = false;
-      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN CON PROBADOR DE IA & REFERENCIAS';
+      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> 🚀 GENERAR PRODUCCIÓN COMPLETA';
 
-      // Switch to Storyboard Tab automatically
       const storyboardTabBtn = document.querySelector('[data-tab="tab-storyboard"]');
       if (storyboardTabBtn) storyboardTabBtn.click();
 
-      alert(`¡Producción v3.5 generada exitosamente para "${inputs.projectTitle}"!\nSe han incorporado todas las referencias de formato, guion, personajes y escenografía.`);
+      alert(`¡Producción v4.0 generada exitosamente para "${inputs.projectTitle}"!\nSe han incorporado las sub-secciones de capítulos y referencias.`);
     }, 1500);
   });
 
   /* ==========================================
-     HOLLYWOOD AGENTS v3.5 PRO BUNDLE BUILDER
+     HOLLYWOOD AGENTS v4.0 BUNDLE BUILDER
      ========================================== */
-  function buildHollywoodProductionBundleV3(inputs, realAiResponse) {
+  function buildHollywoodProductionBundleV4(inputs, realAiResponse) {
     const title = inputs.projectTitle;
     const episodes = inputs.episodesCount;
     const type = inputs.projectType;
 
-    // Parse Characters List
     const characterList = [
       { 
         id: 'CHAR_01_PROTAGONIST',
@@ -750,7 +898,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // 1. Build Storyboard Frames with References
     const storyboardFrames = [];
     const shotsPerEp = 4;
     for (let ep = 1; ep <= episodes; ep++) {
@@ -767,15 +914,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // 2. Metrics & AI Budget Calculator
     const totalScriptWords = episodes * 350;
     const elevenlabsChars = totalScriptWords * 5;
     const soraVideoShots = storyboardFrames.length;
     const fluxImageRenders = characterList.length * 3 + storyboardFrames.length;
     const estimatedRenderTime = Math.ceil((soraVideoShots * 0.5) + (fluxImageRenders * 0.1));
 
-    // 3. 00_SYSTEM_MEMORY_PATTERN.md
-    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v3.5)
+    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v4.0)
 PROYECTO: ${title.toUpperCase()}
 ID DE SEMILLA DE PRODUCCIÓN: SEED_${title.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_2026
 
@@ -790,14 +935,13 @@ ${characterList.map(char => `
 - **Vestuario Fase 2:** ${char.wardrobeEnd}
 `).join('\n')}
 
-## 📋 REGLAS ESTRICTAS DE CONTINUIDAD:
-1. Consistencia facial obligatoria en todas las tomas.
-2. Referencias de Formato: "${inputs.formatReferences}".
-3. Referencias Escenográficas: "${inputs.scenarioReferences}".
-4. Coherencia cromática: "${inputs.colorPalette}".
+## 📋 SUB-SECCIONES DE CAPÍTULOS CONFIGURADAS:
+${inputs.episodesSubsections.map(ep => `
+### CAPÍTULO ${ep.num}: ${ep.title}
+- **Desglose de Escenas:** ${ep.plot}
+`).join('\n')}
 `;
 
-    // 4. DaVinci Resolve EDL (CMX3600 Standard)
     let edlContent = `TITLE: ${title.toUpperCase()}\nFCM: NON-DROP FRAME\n\n`;
     storyboardFrames.forEach((frame, idx) => {
       const idxStr = String(idx + 1).padStart(3, '0');
@@ -806,7 +950,6 @@ ${characterList.map(char => `
       edlContent += `${idxStr}  AX       V     C        ${startTc} ${endTc} ${startTc} ${endTc}\n* FROM CLIP: SHOT_${frame.ep}_${frame.shotNumber}\n\n`;
     });
 
-    // 5. Final Cut / Premiere Pro XML
     const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xmeml>
 <xmeml version="5">
@@ -830,77 +973,59 @@ ${characterList.map(char => `
   </sequence>
 </xmeml>`;
 
-    // 6. Kit Promocional de YouTube & Blogger
-    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER v3.5
+    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER v4.0
 PROYECTO: ${title}
 
 ## 📺 YOUTUBE METADATA & SEO
-
 ### TÍTULOS SUGERIDOS PARA YOUTUBE:
 1. 🔥 De la Pobreza Extrema a la Cúspide Tecnológica | ${title} (Episodio 1)
 2. El Secreto para Construir un Imperio desde Cero 💡
-3. ${title}: La Serie que Cambiará tu Perspectiva del Éxito Financiero
 
 ### DESCRIPCIÓN OPTIMIZADA PARA YOUTUBE:
 ¡Hola a todos los suscriptores y a la audiencia! Bienvenidos a esta impactante serie sobre superación personal y tecnológica.
 
-En esta historia seguimos a ${characterList[0].name}, quien demuestra que con perseverancia autodidacta y visión es posible salir de la pobreza extrema y construir una empresa multimillonaria.
-
-📌 Capítulos de la Serie:
-0:00 - Introducción y la Lucha Inicial
-1:30 - La Chispas del Negocio Digital
-3:00 - Superando el Sabotaje
-4:30 - El Triunfo Final
-
 Si te ha gustado el video no olvides darle un me gusta y suscribirte, hasta la vista!
-
----
-
-### PROMPT PARA LA MINIATURA DE YOUTUBE (THUMBNAIL PROMPT):
-\`\`\`text
-YouTube thumbnail style, high contrast dramatic split screen: left side shows ${characterList[0].name} in a dark humble room studying on an old laptop, right side shows ${characterList[0].name} in a luxury suit on top of a futuristic skyscraper, bold 3D text "DE POBRE A RICO", photorealistic 8k --ar 16:9
-\`\`\`
-
----
-
-## 📝 ENTRADA DE BLOG PARA BLOGGER
-
-### Título: La Increíble Travesía de ${characterList[0].name}: De la Pobreza al Éxito Tecnológico
-
-En el mundo hiperconectado de hoy, las historias de superación personal no solo nos inspiran, sino que nos brindan una hoja de ruta práctica para transformar nuestras propias vidas.
-
-La nueva serie cinematográfica "${title}" relata el camino de ${characterList[0].name}, un joven autodidacta que convirtió las limitaciones de su entorno en el combustible para crear un imperio tecnológico.
 `;
 
-    // 7. System Prompts & Full Scripts
-    let scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR ESCENAS (CON REFERENCIAS ADICIONALES)
+    let scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR SUB-SECCIONES DE CAPÍTULOS v4.0
 PROYECTO: ${title}
 NOTAS DE TRAMA & GIROS: ${inputs.plotReferences}
-REFERENCIAS DE RITMO: ${inputs.formatReferences}
 
 `;
 
     if (realAiResponse) {
-      scripts += `\n--- RESPUESTA GENERADA EN TIEMPO REAL POR OLLAMA AI ---\n\n${realAiResponse}\n\n================================================================================\n`;
+      scripts += `\n--- RESPUESTA DE OLLAMA AI ---\n${realAiResponse}\n\n=================================================================\n`;
     }
 
-    scripts += generateFullScriptTextV3(episodes, title, characterList, inputs);
+    inputs.episodesSubsections.forEach(ep => {
+      scripts += `
+================================================================================
+CAPÍTULO ${ep.num}: "${ep.title.toUpperCase()}"
+================================================================================
+${ep.plot}
 
-    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v3.5\nPROYECTO: ${title}\nREFERENCIAS DE DIRECCIÓN: ${inputs.styleAudioReferences}`;
-    const agentRules = `# AGENT RULES v3.5`;
-    const projectBible = `# PROJECT BIBLE v3.5\nPREMISA: ${inputs.storyPremise}\nNOTAS ADICIONALES: ${inputs.plotReferences}`;
-    const characters = `# DOSSIER CHARACTERS v3.5\nREFERENCIAS DE ACTORES: ${inputs.characterReferences}`;
-    const environments = `# DOSSIER ENVIRONMENTS v3.5\nREFERENCIAS DE ESCENOGRAFÍA: ${inputs.scenarioReferences}`;
-    const cinematography = `# CINEMATOGRAPHY SHOT LIST v3.5\nESTILO VISUAL: ${inputs.artStyle}\nREFERENCIAS: ${inputs.styleAudioReferences}`;
-    const audio = `# AUDIO GUIDE v3.5\nPROCESAMIENTO VOICEOVER: ${inputs.voiceoverStyle}`;
+ESCENA 1. INT. HABITACIÓN / OFICINA - NOCHE
+El protagonista ${characterList[0].name} avanza en la fase ${ep.num}.
+
+---
+`;
+    });
+
+    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v4.0\nPROYECTO: ${title}`;
+    const agentRules = `# AGENT RULES v4.0`;
+    const projectBible = `# PROJECT BIBLE v4.0\nPREMISA: ${inputs.storyPremise}`;
+    const characters = `# DOSSIER CHARACTERS v4.0`;
+    const environments = `# DOSSIER ENVIRONMENTS v4.0`;
+    const cinematography = `# CINEMATOGRAPHY SHOT LIST v4.0`;
+    const audio = `# AUDIO GUIDE v4.0`;
 
     const customGptJson = {
       name: title,
       description: inputs.storyPremise,
-      instructions: `Eres el asistente de producción de la serie ${title}. Manten la coherencia de personajes y vestuario.`
+      instructions: `Asistente de producción para ${title}.`
     };
 
-    const modelfile = `FROM llama3\nSYSTEM "Eres el asistente cinematográfico de ${title}."`;
+    const modelfile = `FROM llama3\nSYSTEM "Asistente cinematográfico de ${title}."`;
 
     return {
       title,
@@ -917,7 +1042,7 @@ REFERENCIAS DE RITMO: ${inputs.formatReferences}
         type,
         episodesCount: episodes,
         generatedAt: new Date().toISOString(),
-        engine: 'Hollywood Agent Studio v3.5 Pro'
+        engine: 'Hollywood Agent Studio v4.0 Pro'
       },
       files: {
         memoryPattern,
@@ -936,43 +1061,6 @@ REFERENCIAS DE RITMO: ${inputs.formatReferences}
         modelfile
       }
     };
-  }
-
-  function generateFullScriptTextV3(episodesCount, title, characterList, inputs) {
-    let fullScript = '';
-    const protagonist = characterList[0]?.name || 'CARLOS';
-    const antagonist = characterList[1]?.name || 'ROBERTO';
-
-    for (let ep = 1; ep <= episodesCount; ep++) {
-      fullScript += `
-================================================================================
-CAPÍTULO ${ep}: "DESARROLLO DE ESCENA ${ep}"
-================================================================================
-
-ESCENA 1. INT. HABITACIÓN / OFICINA - NOCHE
-
-[NOTAS DE REFERENCIA: ${inputs.scenarioReferences || 'Entorno cinematográfico en alto contraste'}]
-[CONTINUITY NOTE: ${protagonist.toUpperCase()} viste ${ep <= 2 ? 'ropa humilde azul desgastada' : 'traje de tres piezas de lujo'}]
-
-La luz tenue ilumina el rostro de ${protagonist.toUpperCase()}.
-
-${protagonist.toUpperCase()}
-(firme, con mirada determinada)
-Cada línea de código que escribo es un paso fuera de la oscuridad.
-
-${antagonist.toUpperCase()}
-(entrando en cuadro)
-El mercado no respeta los sueños sin capital, ${protagonist}.
-
-${protagonist.toUpperCase()}
-El capital se construye con determinación. Observa cómo cambia la historia.
-
-[CORTE A NEGRO]
-
----
-`;
-    }
-    return fullScript;
   }
 
   function extractName(text) {
@@ -1152,7 +1240,7 @@ El capital se construye con determinación. Observa cómo cambia la historia.
   });
 
   /* ==========================================
-     EXPORT QUICK BUTTON v3.5
+     EXPORT QUICK BUTTON v4.0
      ========================================== */
   const btnExportQuick = document.getElementById('btn-export-quick');
 
@@ -1166,7 +1254,7 @@ El capital se construye con determinación. Observa cómo cambia la historia.
       const res = await window.electronAPI.exportProductionPackage(generatedData);
       if (res.success) {
         const zipMsg = res.zipPath ? `\n- Archivo ZIP: ${res.zipPath}` : '';
-        if (confirm(`¡Proyecto v3.5 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
+        if (confirm(`¡Proyecto v4.0 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
           window.electronAPI.openFolder(res.folderPath);
         }
       } else {

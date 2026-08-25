@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO v3.5 PRO SUITE - STYLESHEET WITH LIVE TESTERS
+   HOLLYWOOD AGENT STUDIO v4.0 PRO SUITE - STYLESHEET
    ========================================================================== */
 
 :root {
@@ -218,7 +218,7 @@ body {
 }
 
 .btn-xl {
-  padding: 14px 28px;
+  padding: 14px 24px;
   font-size: 14px;
   border-radius: var(--radius-md);
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
@@ -453,6 +453,54 @@ body {
   margin-bottom: 18px;
 }
 
+/* DYNAMIC EPISODES SUBSECTIONS v4.0 */
+.episodes-section-title {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 14px;
+}
+
+.episodes-section-title h4 {
+  font-size: 14px;
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.episode-card-subsection {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.ep-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.ep-number-badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-preview-ep-ai {
+  font-size: 11px;
+  padding: 5px 12px;
+}
+
 /* FORM ELEMENTS */
 .wizard-card-body {
   flex: 1;
@@ -595,7 +643,7 @@ textarea.form-control {
   border: 1px solid var(--accent-gold);
 }
 
-/* WIZARD FOOTER */
+/* WIZARD FOOTER & FINAL ACTIONS ROW */
 .wizard-footer {
   display: flex;
   justify-content: space-between;
@@ -604,7 +652,21 @@ textarea.form-control {
   border-top: 1px solid var(--border-color);
 }
 
-/* STORYBOARD GRID v3.5 */
+.final-actions-box {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.final-buttons-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* STORYBOARD GRID v4.0 */
 .storyboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -675,7 +737,7 @@ textarea.form-control {
   word-break: break-all;
 }
 
-/* METRICS GRID & BUDGET v3.5 */
+/* METRICS GRID & BUDGET v4.0 */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -943,12 +1005,12 @@ textarea.form-control {
   color: var(--accent-gold);
 }
 
-/* SETTINGS MODAL v3.5 */
+/* SETTINGS MODAL v4.0 FIXED HEADER & CLOSE BUTTON */
 .modal-overlay {
   display: none;
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.75);
   z-index: 100;
   align-items: center;
   justify-content: center;
@@ -964,8 +1026,11 @@ textarea.form-control {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   width: 520px;
-  max-width: 90%;
+  max-width: 92%;
+  max-height: 90vh;
   box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -974,16 +1039,18 @@ textarea.form-control {
 }
 
 .modal-header {
-  padding: 14px 18px;
+  padding: 16px 20px;
   background-color: var(--bg-header);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 5;
 }
 
 .modal-header h3 {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -991,19 +1058,31 @@ textarea.form-control {
 }
 
 .icon-btn-close {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--accent-gold);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
   font-size: 16px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.icon-btn-close:hover { color: var(--text-main); }
+.icon-btn-close:hover {
+  background-color: var(--accent-danger);
+  color: #ffffff;
+  border-color: var(--accent-danger);
+}
 
 .modal-body {
-  padding: 18px;
+  padding: 20px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  flex: 1;
 }
 
 .settings-nav-tabs {
@@ -1041,10 +1120,13 @@ textarea.form-control {
 }
 
 .modal-footer {
-  padding: 12px 18px;
+  padding: 14px 20px;
   background-color: var(--bg-header);
   border-top: 1px solid var(--border-color);
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  z-index: 5;
 }
 
 /* FOOTER */

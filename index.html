@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hollywood Agent Studio v3.5 Pro Suite - IA Production Suite</title>
+  <title>Hollywood Agent Studio v4.0 Pro Suite - IA Production Suite</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Remix Icons / FontAwesome fallback icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,7 +19,7 @@
       <i class="fa-solid fa-clapperboard logo-icon"></i>
       <div class="brand-text">
         <span class="title">HOLLYWOOD AGENT STUDIO</span>
-        <span class="subtitle">v3.5 Pro • Probador de Conexiones IA & Referencias</span>
+        <span class="subtitle">v4.0 Pro • Sub-secciones IA & Guardado Pro</span>
       </div>
     </div>
 
@@ -61,7 +61,7 @@
         <i class="fa-solid fa-gear"></i>
       </button>
       <!-- Export Quick Button -->
-      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v3.5">
+      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v4.0">
         <i class="fa-solid fa-file-zipper"></i> Exportar ZIP
       </button>
     </div>
@@ -95,8 +95,8 @@
         <div class="wizard-container">
           
           <div class="wizard-header">
-            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v3.5</h2>
-            <p>Configura tu producción paso a paso con campos de referencias detalladas por apartado para una orquestación precisa.</p>
+            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v4.0</h2>
+            <p>Configura tu producción paso a paso con sub-secciones dinámicas por capítulo y pre-visualizaciones de IA en tiempo real.</p>
           </div>
 
           <!-- WIZARD STEPPER INDICATOR -->
@@ -108,7 +108,7 @@
             <div class="step-line"></div>
             <div class="step-item" data-step="2">
               <span class="step-num">2</span>
-              <span class="step-label">Premisa & Guion</span>
+              <span class="step-label">Premisa & Capítulos</span>
             </div>
             <div class="step-line"></div>
             <div class="step-item" data-step="3">
@@ -123,7 +123,7 @@
             <div class="step-line"></div>
             <div class="step-item" data-step="5">
               <span class="step-num">5</span>
-              <span class="step-label">Estilo & Sonido</span>
+              <span class="step-label">Estilo & Guardado</span>
             </div>
           </div>
 
@@ -133,7 +133,7 @@
             <!-- STEP 1: FORMAT & TYPE -->
             <div class="wizard-step-content active" id="step-content-1">
               <h3><i class="fa-solid fa-list-check"></i> 1. Tipo de Producción & Referencias de Formato</h3>
-              <p class="section-desc">Selecciona la estructura narrativa y añade observaciones de formato que guiarán la producción.</p>
+              <p class="section-desc">Selecciona la estructura narrativa y el número de capítulos para generar las sub-secciones.</p>
               
               <div class="form-grid">
                 <div class="form-group">
@@ -173,18 +173,18 @@
               <!-- TEXTAREA REFERENCIAS PASO 1 -->
               <div class="form-group mt-3">
                 <label for="format-references"><i class="fa-solid fa-note-sticky"></i> Referencias Adicionales de Formato & Ritmo Narrativo</label>
-                <textarea id="format-references" class="form-control" rows="3" placeholder="Ej: Inspirarse en la estructura acelerada de episodios de series como Succession o Billions, con cortes rápidos y diálogos ágiles.">Estructura dinámica de episodios con introducción contundente de 15 segundos, ritmo acelerado y ganchos de alta tensión al final de cada episodio.</textarea>
+                <textarea id="format-references" class="form-control" rows="3" placeholder="Ej: Inspirarse en la estructura acelerada de episodios...">Estructura dinámica de episodios con introducción contundente de 15 segundos, ritmo acelerado y ganchos de alta tensión al final de cada episodio.</textarea>
               </div>
             </div>
 
-            <!-- STEP 2: STORY PREMISE & PLOT -->
+            <!-- STEP 2: STORY PREMISE & DYNAMIC EPISODE SUBSECTIONS v4.0 -->
             <div class="wizard-step-content" id="step-content-2">
-              <h3><i class="fa-solid fa-book-open"></i> 2. Premisa Narrativa & Notas de Guion</h3>
-              <p class="section-desc">Describe la trama principal, giros de tuerca y referencias de guion.</p>
+              <h3><i class="fa-solid fa-book-open"></i> 2. Premisa General & Sub-secciones Dinámicas por Capítulo</h3>
+              <p class="section-desc">Escribe la premisa general y refina el contenido de cada capítulo con ayuda de la IA en tiempo real.</p>
 
               <div class="form-group">
                 <label for="story-premise"><i class="fa-solid fa-pen-nib"></i> Premisa / Sinopsis General de la Historia</label>
-                <textarea id="story-premise" class="form-control" rows="4" placeholder="Ej: Serie de 4 capítulos sobre un hombre que se convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
+                <textarea id="story-premise" class="form-control" rows="3" placeholder="Ej: Serie de 4 capítulos sobre un hombre que se convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
               </div>
 
               <div class="form-grid">
@@ -211,10 +211,14 @@
                 </div>
               </div>
 
-              <!-- TEXTAREA REFERENCIAS PASO 2 -->
-              <div class="form-group mt-3">
-                <label for="plot-references"><i class="fa-solid fa-lightbulb"></i> Referencias Adicionales de Trama, Giros de Tuerca & Subtramas</label>
-                <textarea id="plot-references" class="form-control" rows="3" placeholder="Ej: En el capítulo 3 debe ocurrir una traición inesperada de su primer socio que lo obliga a reiniciar todo en 24 horas...">En el Capítulo 3 ocurre la traición inesperada de su socio inversor Roberto, quien intenta robar la patente. Carlos debe apoyarse en su mentora Elena para lanzar una versión beta mejorada antes del amanecer.</textarea>
+              <!-- DYNAMIC EPISODE SUBSECTIONS CONTAINER v4.0 -->
+              <div class="episodes-section-title mt-4">
+                <h4><i class="fa-solid fa-film"></i> Sub-secciones por Capítulo (Generadas Dinámicamente)</h4>
+                <p class="small-hint">Cada capítulo generado tiene su propio espacio de edición y botón para pre-visualizar con IA (Ollama/LLM).</p>
+              </div>
+
+              <div id="episodes-subsections-container" class="mt-2">
+                <!-- Dynamically populated via renderer.js -->
               </div>
             </div>
 
@@ -240,10 +244,9 @@
                 <textarea id="secondary-characters" class="form-control" rows="3" placeholder="Ej: 1. Elena (Mentora)...">1. Elena (38 años, empresaria experimentada que se convierte en mentora de Carlos)&#10;2. Roberto (45 años, inversionista sin escrúpulos que intenta arruinar el primer prototipo de Carlos)&#10;3. Lucía (Hermana menor de Carlos, a quien promete sacar de la pobreza)</textarea>
               </div>
 
-              <!-- TEXTAREA REFERENCIAS PASO 3 -->
               <div class="form-group mt-3">
                 <label for="character-references"><i class="fa-solid fa-id-badge"></i> Referencias de Actores, Estilo & Rasgos Psicológicos</label>
-                <textarea id="character-references" class="form-control" rows="3" placeholder="Ej: Protagonista inspirado físicamente en la intensidad de Cillian Murphy con vestuario minimalista de tecnología...">Carlos posee una mirada intensa y determinada, peinado corto impecable y gestos tranquilos. Elena vista trajes de corte moderno con tonos violetas y dorados.</textarea>
+                <textarea id="character-references" class="form-control" rows="3" placeholder="Ej: Protagonista inspirado en Cillian Murphy...">Carlos posee una mirada intensa y determinada, peinado corto impecable y gestos tranquilos. Elena vista trajes de corte moderno con tonos violetas y dorados.</textarea>
               </div>
             </div>
 
@@ -274,17 +277,16 @@
                 </div>
               </div>
 
-              <!-- TEXTAREA REFERENCIAS PASO 4 -->
               <div class="form-group mt-3">
                 <label for="scenario-references"><i class="fa-solid fa-archway"></i> Referencias Escenográficas, Utilería & Fotografías de Inspiración</label>
-                <textarea id="scenario-references" class="form-control" rows="3" placeholder="Ej: Paredes de ladrillo visto, iluminación tipo chiaroscuro, tecnología vintage de inicios de siglo...">Habitación inicial con luz tenue de lámpara de tungsteno, cuadernos llenos de esquemas de algoritmos y tazas de café acumuladas. Oficina final con cristaleras panorámicas y mobiliario escandinavo de lujo.</textarea>
+                <textarea id="scenario-references" class="form-control" rows="3" placeholder="Ej: Paredes de ladrillo visto...">Habitación inicial con luz tenue de lámpara de tungsteno, cuadernos llenos de esquemas de algoritmos y tazas de café acumuladas. Oficina final con cristaleras panorámicas y mobiliario escandinavo de lujo.</textarea>
               </div>
             </div>
 
-            <!-- STEP 5: STYLE, CAMERA & AUDIO -->
+            <!-- STEP 5: STYLE, CAMERA, AUDIO & FINAL SAVE / GENERATION -->
             <div class="wizard-step-content" id="step-content-5">
-              <h3><i class="fa-solid fa-sliders"></i> 5. Estilo Visual, Dirección de Cámara & Audio</h3>
-              <p class="section-desc">Establece el tono técnico y añade referencias de directores o pistas musicales.</p>
+              <h3><i class="fa-solid fa-sliders"></i> 5. Estilo Visual, Audio & Fase Final de Producción</h3>
+              <p class="section-desc">Establece el tono técnico final. Puedes guardar el borrador del proyecto o ejecutar la generación completa.</p>
 
               <div class="form-grid">
                 <div class="form-group">
@@ -317,22 +319,26 @@
 
                 <div class="form-group">
                   <label for="music-style"><i class="fa-solid fa-music"></i> Estilo Musical & Efectos de Sonido</label>
-                  <input type="text" id="music-style" class="form-control" placeholder="Ej: Piano melancólico inicial -> Orquesta crescendo épica" value="Piano melancólico y sintetizador suave que crece hacia una sinfonía orquestal motivacional">
+                  <input type="text" id="music-style" class="form-control" placeholder="Ej: Piano melancólico..." value="Piano melancólico y sintetizador suave que crece hacia una sinfonía orquestal motivacional">
                 </div>
               </div>
 
-              <!-- TEXTAREA REFERENCIAS PASO 5 -->
               <div class="form-group mt-3">
                 <label for="style-audio-references"><i class="fa-solid fa-clapperboard"></i> Referencias Cinematográficas de Directores, Lentes & Pistas Musicales</label>
-                <textarea id="style-audio-references" class="form-control" rows="3" placeholder="Ej: Dirección de fotografía al estilo Denis Villeneuve con banda sonora orquestal al estilo Hans Zimmer...">Fotografía con lentes anamórficos de 35mm estilo David Fincher, con contraste marcado e iluminación Rembrandt. Música inspirada en composiciones de Hans Zimmer y Max Richter.</textarea>
+                <textarea id="style-audio-references" class="form-control" rows="2" placeholder="Ej: Dirección de fotografía al estilo Denis Villeneuve...">Fotografía con lentes anamórficos de 35mm estilo David Fincher. Música inspirada en composiciones de Hans Zimmer.</textarea>
               </div>
 
-              <!-- GENERATE BUTTON -->
-              <div class="generate-box mt-4 text-center">
-                <button id="btn-run-generation" class="btn btn-primary btn-xl">
-                  <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN CON PROBADOR DE IA & REFERENCIAS
-                </button>
-                <p class="small-hint">Procesa las referencias con el proveedor de IA configurado (Ollama, Gemini, OpenAI) o motor inteligente.</p>
+              <!-- FINAL ACTIONS BOX WITH INDEPENDENT SAVE BUTTON v4.0 -->
+              <div class="final-actions-box mt-4">
+                <div class="final-buttons-row">
+                  <button id="btn-save-project-final" class="btn btn-secondary btn-xl">
+                    <i class="fa-solid fa-floppy-disk"></i> 💾 GUARDAR BORRADOR DE PROYECTO
+                  </button>
+                  <button id="btn-run-generation" class="btn btn-primary btn-xl">
+                    <i class="fa-solid fa-rocket"></i> 🚀 GENERAR PRODUCCIÓN COMPLETA
+                  </button>
+                </div>
+                <p class="small-hint mt-2 text-center">Puedes guardar el proyecto para editarlo luego o ejecutar la red de 10 agentes de Hollywood.</p>
               </div>
             </div>
 
@@ -352,7 +358,7 @@
       </section>
 
 
-      <!-- ==================== TAB 2: STORYBOARD VISUAL STUDIO v3.5 ==================== -->
+      <!-- ==================== TAB 2: STORYBOARD VISUAL STUDIO ==================== -->
       <section id="tab-storyboard" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-image"></i> Visual Storyboard Studio (Previsualización de Tomas)</h2>
@@ -610,12 +616,12 @@
 
   </div>
 
-  <!-- ==================== SETTINGS MODAL WITH CONNECTION TESTERS v3.5 ==================== -->
+  <!-- ==================== SETTINGS MODAL v4.0 (WITH VISIBLE CLOSE X & FOOTER CANCEL) ==================== -->
   <div id="settings-modal" class="modal-overlay">
     <div class="modal-card modal-large">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & Probador de Estado v3.5</h3>
-        <button id="btn-close-settings" class="icon-btn-close"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & Probador de Estado v4.0</h3>
+        <button id="btn-close-settings-x" class="icon-btn-close" title="Cerrar ventana de Ajustes (Esc)"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
       <div class="modal-body">
@@ -755,7 +761,8 @@
       </div>
 
       <div class="modal-footer">
-        <button id="btn-save-settings" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Todas las Conexiones</button>
+        <button id="btn-cancel-settings" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancelar / Cerrar</button>
+        <button id="btn-save-settings" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Conexiones</button>
       </div>
     </div>
   </div>
@@ -764,7 +771,7 @@
   <!-- ==================== FOOTER & CREDITS BAR ==================== -->
   <footer class="app-footer">
     <div class="footer-left">
-      <span>Hollywood Agent Studio v3.5 Pro &copy; 2026</span>
+      <span>Hollywood Agent Studio v4.0 Pro &copy; 2026</span>
       <span class="dot-separator">•</span>
       <span>Desarrollado por <strong><a href="https://christian-freelance.us/" target="_blank" class="credit-link">Christian Herencia</a></strong></span>
     </div>
