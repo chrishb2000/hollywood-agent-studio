@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO v4.0 PRO SUITE - RENDERER SCRIPT
+   HOLLYWOOD AGENT STUDIO v4.5 PRO SUITE - RENDERER SCRIPT
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -218,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('output-memory').value = data.files.memoryPattern || '';
     document.getElementById('output-script').value = data.files.scripts || '';
     document.getElementById('output-characters').value = data.files.characters || '';
+    if (document.getElementById('output-environments')) document.getElementById('output-environments').value = data.files.environments || '';
     document.getElementById('output-camera').value = data.files.cinematography || '';
     document.getElementById('output-audio').value = data.files.audio || '';
     document.getElementById('output-promo-kit').value = data.files.promoKit || '';
@@ -267,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('output-memory').value = '';
     document.getElementById('output-script').value = '';
     document.getElementById('output-characters').value = '';
+    if (document.getElementById('output-environments')) document.getElementById('output-environments').value = '';
     document.getElementById('output-camera').value = '';
     document.getElementById('output-audio').value = '';
     document.getElementById('output-promo-kit').value = '';
@@ -294,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSaveProjectFinal) btnSaveProjectFinal.addEventListener('click', saveCurrentProjectState);
 
   /* ==========================================
-     DYNAMIC EPISODE SUBSECTIONS GENERATOR v4.0
+     DYNAMIC EPISODE SUBSECTIONS GENERATOR v4.5
      ========================================== */
   const episodesCountInput = document.getElementById('episodes-count');
 
@@ -531,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     SETTINGS MODAL EASY CLOSE HANDLERS v4.0
+     SETTINGS MODAL EASY CLOSE HANDLERS v4.5
      ========================================== */
   const btnSettings = document.getElementById('btn-settings');
   const modalSettings = document.getElementById('settings-modal');
@@ -812,7 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================
-     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v4.0
+     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v4.5
      ========================================== */
   const btnRunGeneration = document.getElementById('btn-run-generation');
 
@@ -851,24 +853,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setTimeout(() => {
-      generatedData = buildHollywoodProductionBundleV4(inputs, aiGeneratedScript);
+      generatedData = buildHollywoodProductionBundleV4_5(inputs, aiGeneratedScript);
       populateGeneratedOutputs(generatedData);
       saveCurrentProjectState();
 
       btnRunGeneration.disabled = false;
       btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> 🚀 GENERAR PRODUCCIÓN COMPLETA';
 
-      const storyboardTabBtn = document.querySelector('[data-tab="tab-storyboard"]');
-      if (storyboardTabBtn) storyboardTabBtn.click();
+      // Auto switch to Script & Bible Tab (Paso 2 del flujo cinematográfico)
+      const scriptTabBtn = document.querySelector('[data-tab="tab-script"]');
+      if (scriptTabBtn) scriptTabBtn.click();
 
-      alert(`¡Producción v4.0 generada exitosamente para "${inputs.projectTitle}"!\nSe han incorporado las sub-secciones de capítulos y referencias.`);
+      alert(`¡Producción v4.5 generada exitosamente para "${inputs.projectTitle}"!\nTe redirigimos primero a los Guiones & Biblia para revisar la historia antes de llegar al Storyboard Visual.`);
     }, 1500);
   });
 
   /* ==========================================
-     HOLLYWOOD AGENTS v4.0 BUNDLE BUILDER
+     HOLLYWOOD AGENTS v4.5 BUNDLE BUILDER
      ========================================== */
-  function buildHollywoodProductionBundleV4(inputs, realAiResponse) {
+  function buildHollywoodProductionBundleV4_5(inputs, realAiResponse) {
     const title = inputs.projectTitle;
     const episodes = inputs.episodesCount;
     const type = inputs.projectType;
@@ -898,6 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Storyboard Visual uses consolidated characters, wardrobe, locations and scripts
     const storyboardFrames = [];
     const shotsPerEp = 4;
     for (let ep = 1; ep <= episodes; ep++) {
@@ -908,8 +912,8 @@ document.addEventListener('DOMContentLoaded', () => {
           shotNumber: s,
           angle: shotAngle,
           title: `Capítulo ${ep} - Plano ${s}: ${shotAngle}`,
-          desc: `Tomas de la fase ${ep} mostrando a ${characterList[0].name}. Estilo de cámara: ${inputs.cameraStyle}.`,
-          prompt: `Cinematic ${shotAngle.toLowerCase()} shot of ${characterList[0].name}, ${inputs.artStyle}, lighting in ${inputs.colorPalette}, photorealistic 8k --ar 16:9`
+          desc: `Tomas de la fase ${ep} mostrando a ${characterList[0].name} con vestuario ${ep <= 2 ? characterList[0].wardrobeStart : characterList[0].wardrobeEnd}. Estilo de cámara: ${inputs.cameraStyle}.`,
+          prompt: `Cinematic ${shotAngle.toLowerCase()} shot of ${characterList[0].name}, wearing ${ep <= 2 ? characterList[0].wardrobeStart : characterList[0].wardrobeEnd}, in ${inputs.keyLocations.split('\n')[0] || 'location'}, ${inputs.artStyle}, lighting in ${inputs.colorPalette}, photorealistic 8k --ar 16:9`
         });
       }
     }
@@ -920,7 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fluxImageRenders = characterList.length * 3 + storyboardFrames.length;
     const estimatedRenderTime = Math.ceil((soraVideoShots * 0.5) + (fluxImageRenders * 0.1));
 
-    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v4.0)
+    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v4.5)
 PROYECTO: ${title.toUpperCase()}
 ID DE SEMILLA DE PRODUCCIÓN: SEED_${title.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_2026
 
@@ -973,7 +977,7 @@ ${inputs.episodesSubsections.map(ep => `
   </sequence>
 </xmeml>`;
 
-    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER v4.0
+    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER v4.5
 PROYECTO: ${title}
 
 ## 📺 YOUTUBE METADATA & SEO
@@ -987,7 +991,7 @@ PROYECTO: ${title}
 Si te ha gustado el video no olvides darle un me gusta y suscribirte, hasta la vista!
 `;
 
-    let scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR SUB-SECCIONES DE CAPÍTULOS v4.0
+    let scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR SUB-SECCIONES DE CAPÍTULOS v4.5
 PROYECTO: ${title}
 NOTAS DE TRAMA & GIROS: ${inputs.plotReferences}
 
@@ -1011,13 +1015,13 @@ El protagonista ${characterList[0].name} avanza en la fase ${ep.num}.
 `;
     });
 
-    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v4.0\nPROYECTO: ${title}`;
-    const agentRules = `# AGENT RULES v4.0`;
-    const projectBible = `# PROJECT BIBLE v4.0\nPREMISA: ${inputs.storyPremise}`;
-    const characters = `# DOSSIER CHARACTERS v4.0`;
-    const environments = `# DOSSIER ENVIRONMENTS v4.0`;
-    const cinematography = `# CINEMATOGRAPHY SHOT LIST v4.0`;
-    const audio = `# AUDIO GUIDE v4.0`;
+    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v4.5\nPROYECTO: ${title}`;
+    const agentRules = `# AGENT RULES v4.5`;
+    const projectBible = `# PROJECT BIBLE v4.5\nPREMISA: ${inputs.storyPremise}`;
+    const characters = `# DOSSIER CHARACTERS v4.5`;
+    const environments = `# DOSSIER DE ESCENARIOS v4.5\nUBICACIONES CLAVE:\n${inputs.keyLocations}\nREFERENCIAS DE ESCENOGRAFÍA:\n${inputs.scenarioReferences}`;
+    const cinematography = `# CINEMATOGRAPHY SHOT LIST v4.5`;
+    const audio = `# AUDIO GUIDE v4.5\nLOCUCIÓN: ${inputs.voiceoverStyle}\nMÚSICA: ${inputs.musicStyle}`;
 
     const customGptJson = {
       name: title,
@@ -1042,7 +1046,7 @@ El protagonista ${characterList[0].name} avanza en la fase ${ep.num}.
         type,
         episodesCount: episodes,
         generatedAt: new Date().toISOString(),
-        engine: 'Hollywood Agent Studio v4.0 Pro'
+        engine: 'Hollywood Agent Studio v4.5 Pro'
       },
       files: {
         memoryPattern,
@@ -1240,7 +1244,7 @@ El protagonista ${characterList[0].name} avanza en la fase ${ep.num}.
   });
 
   /* ==========================================
-     EXPORT QUICK BUTTON v4.0
+     EXPORT QUICK BUTTON v4.5
      ========================================== */
   const btnExportQuick = document.getElementById('btn-export-quick');
 
@@ -1254,7 +1258,7 @@ El protagonista ${characterList[0].name} avanza en la fase ${ep.num}.
       const res = await window.electronAPI.exportProductionPackage(generatedData);
       if (res.success) {
         const zipMsg = res.zipPath ? `\n- Archivo ZIP: ${res.zipPath}` : '';
-        if (confirm(`¡Proyecto v4.0 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
+        if (confirm(`¡Proyecto v4.5 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
           window.electronAPI.openFolder(res.folderPath);
         }
       } else {

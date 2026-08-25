@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hollywood Agent Studio v4.0 Pro Suite - IA Production Suite</title>
+  <title>Hollywood Agent Studio v4.5 Pro Suite - IA Production Suite</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Remix Icons / FontAwesome fallback icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-  <!-- TOP NAVIGATION BAR -->
+  <!-- TOP NAVIGATION BAR WITH LOGICAL FILMMAKING PIPELINE -->
   <header class="app-header">
     <div class="brand">
       <button id="btn-toggle-sidebar" class="icon-btn" title="Alternar Sidebar de Proyectos">
@@ -19,31 +19,38 @@
       <i class="fa-solid fa-clapperboard logo-icon"></i>
       <div class="brand-text">
         <span class="title">HOLLYWOOD AGENT STUDIO</span>
-        <span class="subtitle">v4.0 Pro • Sub-secciones IA & Guardado Pro</span>
+        <span class="subtitle">v4.5 Pro • Flujo Cinematográfico Secuencial</span>
       </div>
     </div>
 
+    <!-- LOGICAL PIPELINE: WIZARD -> SCRIPT -> CHARACTERS -> ENVIRONMENTS -> AUDIO -> STORYBOARD -> MEMORY -> BUDGET -->
     <nav class="nav-tabs">
-      <button class="nav-btn active" data-tab="tab-wizard">
+      <button class="nav-btn active" data-tab="tab-wizard" title="Paso 1: Asistente">
         <i class="fa-solid fa-wand-magic-sparkles"></i> Asistente
       </button>
-      <button class="nav-btn" data-tab="tab-storyboard">
-        <i class="fa-solid fa-image"></i> Storyboard Visual
-      </button>
-      <button class="nav-btn" data-tab="tab-budget-pro">
-        <i class="fa-solid fa-calculator"></i> Presupuesto & Pro Export
-      </button>
-      <button class="nav-btn" data-tab="tab-agents">
-        <i class="fa-solid fa-user-gear"></i> Agentes (10)
-      </button>
-      <button class="nav-btn" data-tab="tab-memory">
-        <i class="fa-solid fa-brain"></i> Memoria Continuada
-      </button>
-      <button class="nav-btn" data-tab="tab-script">
+      <button class="nav-btn" data-tab="tab-script" title="Paso 2: Guiones & Biblia">
         <i class="fa-solid fa-scroll"></i> Guiones
       </button>
-      <button class="nav-btn" data-tab="tab-characters">
+      <button class="nav-btn" data-tab="tab-characters" title="Paso 3: Personajes & Vestuario">
         <i class="fa-solid fa-users-viewfinder"></i> Personajes
+      </button>
+      <button class="nav-btn" data-tab="tab-environments" title="Paso 4: Escenarios & Arte">
+        <i class="fa-solid fa-mountain-city"></i> Escenarios
+      </button>
+      <button class="nav-btn" data-tab="tab-audio" title="Paso 5: Locución & Audio">
+        <i class="fa-solid fa-headphones"></i> Audio
+      </button>
+      <button class="nav-btn" data-tab="tab-storyboard" title="Paso 6: Storyboard Visual (Fase Final Visual)">
+        <i class="fa-solid fa-image"></i> Storyboard Visual
+      </button>
+      <button class="nav-btn" data-tab="tab-memory" title="Paso 7: Memoria Continuada">
+        <i class="fa-solid fa-brain"></i> Memoria
+      </button>
+      <button class="nav-btn" data-tab="tab-budget-pro" title="Paso 8: Presupuesto & Pro Export">
+        <i class="fa-solid fa-calculator"></i> Presupuesto / Export
+      </button>
+      <button class="nav-btn" data-tab="tab-agents" title="Red de 10 Agentes">
+        <i class="fa-solid fa-user-gear"></i> Agentes (10)
       </button>
     </nav>
 
@@ -61,7 +68,7 @@
         <i class="fa-solid fa-gear"></i>
       </button>
       <!-- Export Quick Button -->
-      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v4.0">
+      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v4.5">
         <i class="fa-solid fa-file-zipper"></i> Exportar ZIP
       </button>
     </div>
@@ -95,8 +102,8 @@
         <div class="wizard-container">
           
           <div class="wizard-header">
-            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v4.0</h2>
-            <p>Configura tu producción paso a paso con sub-secciones dinámicas por capítulo y pre-visualizaciones de IA en tiempo real.</p>
+            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v4.5</h2>
+            <p>Configura la historia, personajes, escenarios y audio para que la IA arme el Storyboard Visual al final.</p>
           </div>
 
           <!-- WIZARD STEPPER INDICATOR -->
@@ -170,14 +177,13 @@
                 </div>
               </div>
 
-              <!-- TEXTAREA REFERENCIAS PASO 1 -->
               <div class="form-group mt-3">
                 <label for="format-references"><i class="fa-solid fa-note-sticky"></i> Referencias Adicionales de Formato & Ritmo Narrativo</label>
                 <textarea id="format-references" class="form-control" rows="3" placeholder="Ej: Inspirarse en la estructura acelerada de episodios...">Estructura dinámica de episodios con introducción contundente de 15 segundos, ritmo acelerado y ganchos de alta tensión al final de cada episodio.</textarea>
               </div>
             </div>
 
-            <!-- STEP 2: STORY PREMISE & DYNAMIC EPISODE SUBSECTIONS v4.0 -->
+            <!-- STEP 2: STORY PREMISE & DYNAMIC EPISODE SUBSECTIONS -->
             <div class="wizard-step-content" id="step-content-2">
               <h3><i class="fa-solid fa-book-open"></i> 2. Premisa General & Sub-secciones Dinámicas por Capítulo</h3>
               <p class="section-desc">Escribe la premisa general y refina el contenido de cada capítulo con ayuda de la IA en tiempo real.</p>
@@ -211,15 +217,12 @@
                 </div>
               </div>
 
-              <!-- DYNAMIC EPISODE SUBSECTIONS CONTAINER v4.0 -->
               <div class="episodes-section-title mt-4">
                 <h4><i class="fa-solid fa-film"></i> Sub-secciones por Capítulo (Generadas Dinámicamente)</h4>
                 <p class="small-hint">Cada capítulo generado tiene su propio espacio de edición y botón para pre-visualizar con IA (Ollama/LLM).</p>
               </div>
 
-              <div id="episodes-subsections-container" class="mt-2">
-                <!-- Dynamically populated via renderer.js -->
-              </div>
+              <div id="episodes-subsections-container" class="mt-2"></div>
             </div>
 
             <!-- STEP 3: CHARACTERS -->
@@ -328,7 +331,7 @@
                 <textarea id="style-audio-references" class="form-control" rows="2" placeholder="Ej: Dirección de fotografía al estilo Denis Villeneuve...">Fotografía con lentes anamórficos de 35mm estilo David Fincher. Música inspirada en composiciones de Hans Zimmer.</textarea>
               </div>
 
-              <!-- FINAL ACTIONS BOX WITH INDEPENDENT SAVE BUTTON v4.0 -->
+              <!-- FINAL ACTIONS BOX WITH INDEPENDENT SAVE BUTTON -->
               <div class="final-actions-box mt-4">
                 <div class="final-buttons-row">
                   <button id="btn-save-project-final" class="btn btn-secondary btn-xl">
@@ -358,11 +361,93 @@
       </section>
 
 
-      <!-- ==================== TAB 2: STORYBOARD VISUAL STUDIO ==================== -->
+      <!-- ==================== TAB 2: GUIONES & BIBLIA DEL PROYECTO (FASE 1) ==================== -->
+      <section id="tab-script" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-scroll"></i> Biblia de Producción & Guiones Desglosados</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-script"><i class="fa-regular fa-copy"></i> Copiar Guiones</button>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-film"></i> Guion cinematográfico completo por episodios</span>
+          </div>
+          <textarea id="output-script" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver la Biblia y Guiones desglosados aquí..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 3: PERSONAJES & VESTUARIO (FASE 2) ==================== -->
+      <section id="tab-characters" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-users-viewfinder"></i> Fichas de Personajes & Vestuario</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-characters"><i class="fa-regular fa-copy"></i> Copiar Fichas</button>
+          </div>
+        </div>
+
+        <div class="avatar-preview-section">
+          <h3><i class="fa-solid fa-id-card"></i> Vista Previa de Avatares & Referencias Visuales Generadas</h3>
+          <div class="avatar-cards-row" id="avatar-cards-container">
+            <div class="avatar-placeholder-box">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <p>Haz clic en "Generar Producción Completa" para construir las tarjetas visuales de tus personajes y escenarios.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-container mt-3">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-paint-roller"></i> Dossier técnico de consistencia visual & vestuario (Midjourney / Flux / DALL-E 3)</span>
+          </div>
+          <textarea id="output-characters" class="code-editor" readonly placeholder="Dossier de personajes, vestuario y conceptos visuales..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 4: ESCENARIOS & ARTE (FASE 3) ==================== -->
+      <section id="tab-environments" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-mountain-city"></i> Dossier de Escenarios, Iluminación & Atrezzo</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-environments"><i class="fa-regular fa-copy"></i> Copiar Escenarios</button>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-archway"></i> Entornos, ubicaciones clave y prompts de fondo</span>
+          </div>
+          <textarea id="output-environments" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver los Escenarios e Iluminación aquí..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 5: LOCUCIÓN & AUDIO (FASE 4) ==================== -->
+      <section id="tab-audio" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-headphones"></i> Pautas de Locución (ElevenLabs) & Música</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-audio"><i class="fa-regular fa-copy"></i> Copiar Audio</button>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-microphone"></i> Marcadores de tono de voz, timing y banda sonora</span>
+          </div>
+          <textarea id="output-audio" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver la Pauta de Audio aquí..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 6: STORYBOARD VISUAL & PLANOS (FASE FINAL VISUAL) ==================== -->
       <section id="tab-storyboard" class="tab-pane">
         <div class="section-header">
-          <h2><i class="fa-solid fa-image"></i> Visual Storyboard Studio (Previsualización de Tomas)</h2>
-          <p>Tira cómica de storyboards generados por la red de agentes con encuadres, ángulos y prompts visuales escena por escena.</p>
+          <h2><i class="fa-solid fa-image"></i> Visual Storyboard Studio (Fase Final de Síntesis Visual)</h2>
+          <p>Tira cómica de storyboards generada utilizando los personajes, vestuario, escenarios y guiones previamente creados.</p>
         </div>
 
         <div class="storyboard-grid" id="storyboard-container">
@@ -374,7 +459,25 @@
       </section>
 
 
-      <!-- ==================== TAB 3: PRESUPUESTO & EXPORTACIÓN PRO ==================== -->
+      <!-- ==================== TAB 7: PATRÓN DE MEMORIA CONTINUADA ==================== -->
+      <section id="tab-memory" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-brain"></i> Patrón de Memoria Continuada para IAs</h2>
+          <div class="actions">
+            <button class="btn btn-secondary btn-copy" data-target="output-memory"><i class="fa-regular fa-copy"></i> Copiar Memoria</button>
+          </div>
+        </div>
+
+        <div class="editor-container">
+          <div class="output-header">
+            <span class="badge"><i class="fa-solid fa-lock"></i> Reglas de memoria fija, tokens de consistencia y contexto para ChatGPT / Claude / Gemini / Ollama</span>
+          </div>
+          <textarea id="output-memory" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver el Patrón de Memoria Continuada aquí..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 8: PRESUPUESTO & EXPORTACIÓN PRO ==================== -->
       <section id="tab-budget-pro" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-calculator"></i> Calculadora de Presupuesto IA & Exportación Pro</h2>
@@ -438,7 +541,7 @@
       </section>
 
 
-      <!-- ==================== TAB 4: RED DE 10 AGENTES DE HOLLYWOOD ==================== -->
+      <!-- ==================== TAB 9: RED DE 10 AGENTES DE HOLLYWOOD ==================== -->
       <section id="tab-agents" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-user-gear"></i> Red Completa de 10 Agentes Especializados de Hollywood</h2>
@@ -548,79 +651,15 @@
         </div>
       </section>
 
-
-      <!-- ==================== TAB 5: PATRÓN DE MEMORIA CONTINUADA ==================== -->
-      <section id="tab-memory" class="tab-pane">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-brain"></i> Patrón de Memoria Continuada para IAs</h2>
-          <div class="actions">
-            <button class="btn btn-secondary btn-copy" data-target="output-memory"><i class="fa-regular fa-copy"></i> Copiar Memoria</button>
-          </div>
-        </div>
-
-        <div class="editor-container">
-          <div class="output-header">
-            <span class="badge"><i class="fa-solid fa-lock"></i> Reglas de memoria fija, tokens de consistencia y contexto para ChatGPT / Claude / Gemini / Ollama</span>
-          </div>
-          <textarea id="output-memory" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver el Patrón de Memoria Continuada aquí..."></textarea>
-        </div>
-      </section>
-
-
-      <!-- ==================== TAB 6: GUIONES & BIBLIA DEL PROYECTO ==================== -->
-      <section id="tab-script" class="tab-pane">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-scroll"></i> Biblia de Producción & Guiones Desglosados</h2>
-          <div class="actions">
-            <button class="btn btn-secondary btn-copy" data-target="output-script"><i class="fa-regular fa-copy"></i> Copiar Guiones</button>
-          </div>
-        </div>
-
-        <div class="editor-container">
-          <div class="output-header">
-            <span class="badge"><i class="fa-solid fa-film"></i> Guion cinematográfico completo por episodios</span>
-          </div>
-          <textarea id="output-script" class="code-editor" readonly placeholder="Genera primero tu proyecto en el Asistente para ver la Biblia y Guiones desglosados aquí..."></textarea>
-        </div>
-      </section>
-
-
-      <!-- ==================== TAB 7: PERSONAJES & ESCENARIOS ==================== -->
-      <section id="tab-characters" class="tab-pane">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-users-viewfinder"></i> Fichas de Personajes & Escenarios</h2>
-          <div class="actions">
-            <button class="btn btn-secondary btn-copy" data-target="output-characters"><i class="fa-regular fa-copy"></i> Copiar Fichas</button>
-          </div>
-        </div>
-
-        <div class="avatar-preview-section">
-          <h3><i class="fa-solid fa-id-card"></i> Vista Previa de Avatares & Referencias Visuales Generadas</h3>
-          <div class="avatar-cards-row" id="avatar-cards-container">
-            <div class="avatar-placeholder-box">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
-              <p>Haz clic en "Generar Producción Completa" para construir las tarjetas visuales de tus personajes y escenarios.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="editor-container mt-3">
-          <div class="output-header">
-            <span class="badge"><i class="fa-solid fa-paint-roller"></i> Dossier técnico de consistencia visual & vestuario (Midjourney / Flux / DALL-E 3)</span>
-          </div>
-          <textarea id="output-characters" class="code-editor" readonly placeholder="Dossier de personajes, vestuario y conceptos visuales..."></textarea>
-        </div>
-      </section>
-
     </main>
 
   </div>
 
-  <!-- ==================== SETTINGS MODAL v4.0 (WITH VISIBLE CLOSE X & FOOTER CANCEL) ==================== -->
+  <!-- ==================== SETTINGS MODAL v4.5 ==================== -->
   <div id="settings-modal" class="modal-overlay">
     <div class="modal-card modal-large">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & Probador de Estado v4.0</h3>
+        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & Probador de Estado v4.5</h3>
         <button id="btn-close-settings-x" class="icon-btn-close" title="Cerrar ventana de Ajustes (Esc)"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
@@ -647,7 +686,6 @@
             </select>
           </div>
 
-          <!-- OLLAMA TESTER BOX -->
           <div class="connection-tester-card mt-2">
             <div class="form-group">
               <label for="ollama-url">Ollama Local Server URL</label>
@@ -666,7 +704,6 @@
             </div>
           </div>
 
-          <!-- LM STUDIO TESTER BOX -->
           <div class="connection-tester-card mt-2">
             <div class="form-group">
               <label for="lmstudio-url">LM Studio Local Server URL</label>
@@ -678,7 +715,6 @@
             </div>
           </div>
 
-          <!-- CLOUD API KEYS TESTERS -->
           <div class="form-grid mt-2">
             <div class="form-group">
               <label for="gemini-key">Google Gemini API Key</label>
@@ -771,7 +807,7 @@
   <!-- ==================== FOOTER & CREDITS BAR ==================== -->
   <footer class="app-footer">
     <div class="footer-left">
-      <span>Hollywood Agent Studio v4.0 Pro &copy; 2026</span>
+      <span>Hollywood Agent Studio v4.5 Pro &copy; 2026</span>
       <span class="dot-separator">•</span>
       <span>Desarrollado por <strong><a href="https://christian-freelance.us/" target="_blank" class="credit-link">Christian Herencia</a></strong></span>
     </div>
