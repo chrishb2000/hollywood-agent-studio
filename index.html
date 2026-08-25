@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hollywood Agent Studio v2.0 - Asistente de Producción Audiovisual IA</title>
+  <title>Hollywood Agent Studio v3.0 Pro Suite - IA Production Suite</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Remix Icons / FontAwesome fallback icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,28 +19,31 @@
       <i class="fa-solid fa-clapperboard logo-icon"></i>
       <div class="brand-text">
         <span class="title">HOLLYWOOD AGENT STUDIO</span>
-        <span class="subtitle">v2.0 IA Production Suite & Continuidad</span>
+        <span class="subtitle">v3.0 Pro Suite • Storyboard & Conexiones IA</span>
       </div>
     </div>
 
     <nav class="nav-tabs">
       <button class="nav-btn active" data-tab="tab-wizard">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Asistente de Producción
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Asistente
+      </button>
+      <button class="nav-btn" data-tab="tab-storyboard">
+        <i class="fa-solid fa-image"></i> Storyboard Visual
+      </button>
+      <button class="nav-btn" data-tab="tab-budget-pro">
+        <i class="fa-solid fa-calculator"></i> Presupuesto & Pro Export
       </button>
       <button class="nav-btn" data-tab="tab-agents">
         <i class="fa-solid fa-user-gear"></i> Agentes (10)
       </button>
       <button class="nav-btn" data-tab="tab-memory">
-        <i class="fa-solid fa-brain"></i> Patrón de Memoria
+        <i class="fa-solid fa-brain"></i> Memoria Continuada
       </button>
       <button class="nav-btn" data-tab="tab-script">
-        <i class="fa-solid fa-scroll"></i> Guiones & Biblia
+        <i class="fa-solid fa-scroll"></i> Guiones
       </button>
       <button class="nav-btn" data-tab="tab-characters">
-        <i class="fa-solid fa-users-viewfinder"></i> Personajes & Escenarios
-      </button>
-      <button class="nav-btn" data-tab="tab-camera-audio">
-        <i class="fa-solid fa-video"></i> Planos & Audio
+        <i class="fa-solid fa-users-viewfinder"></i> Personajes
       </button>
     </nav>
 
@@ -54,11 +57,11 @@
         <i class="fa-solid fa-moon"></i>
       </button>
       <!-- Settings -->
-      <button id="btn-settings" class="icon-btn" title="Ajustes de IA & APIs">
+      <button id="btn-settings" class="icon-btn" title="Ajustes de Conexiones IA & APIs">
         <i class="fa-solid fa-gear"></i>
       </button>
       <!-- Export Quick Button -->
-      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP">
+      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v3.0">
         <i class="fa-solid fa-file-zipper"></i> Exportar ZIP
       </button>
     </div>
@@ -80,7 +83,7 @@
         <!-- Projects rendered dynamically via renderer.js -->
         <div class="sidebar-empty-state">
           <i class="fa-solid fa-film"></i>
-          <p>No hay proyectos guardados. Genera uno nuevo y presiona "Guardar".</p>
+          <p>No hay proyectos guardados. Configura uno y presiona "Guardar".</p>
         </div>
       </div>
     </aside>
@@ -93,8 +96,8 @@
         <div class="wizard-container">
           
           <div class="wizard-header">
-            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual</h2>
-            <p>Configura tu producción paso a paso. La red de 10 agentes de Hollywood desarrollará toda la pre-producción, guiones, conceptos visuales, vestuario, continuidad y patrón de memoria para la IA.</p>
+            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v3.0 Pro</h2>
+            <p>Configura tu producción paso a paso. La red de 10 agentes de Hollywood desarrollará toda la pre-producción, storyboard visual, guiones, vestuario, continuidad y patrones de memoria.</p>
           </div>
 
           <!-- WIZARD STEPPER INDICATOR -->
@@ -176,7 +179,7 @@
 
               <div class="form-group">
                 <label for="story-premise"><i class="fa-solid fa-pen-nib"></i> Premisa / Sinopsis de la Historia</label>
-                <textarea id="story-premise" class="form-control" rows="5" placeholder="Ej: Serie de 4 capítulos sobre un hombre que convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
+                <textarea id="story-premise" class="form-control" rows="5" placeholder="Ej: Serie de 4 capítulos sobre un hombre que se convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
               </div>
 
               <div class="form-grid">
@@ -298,9 +301,9 @@
               <!-- GENERATE BUTTON -->
               <div class="generate-box mt-4 text-center">
                 <button id="btn-run-generation" class="btn btn-primary btn-xl">
-                  <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN COMPLETA (10 AGENTES IA + PATRÓN MEMORIA)
+                  <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN PRO v3.0 (STORYBOARD + EDL/XML + PROMO KIT)
                 </button>
-                <p class="small-hint">La IA ejecutará a los 10 agentes de Hollywood: Director Master, Script Supervisor de Continuidad, Guionista, Fotografía, Vestuario, Arte, Sonido, Colorista y Arquitecto de Memoria.</p>
+                <p class="small-hint">Genera la pre-producción completa: Storyboard visual, desglosados, EDL/XML para editores, presupuestos de IA y Kit de YouTube/Blogger.</p>
               </div>
             </div>
 
@@ -320,7 +323,90 @@
       </section>
 
 
-      <!-- ==================== TAB 2: RED DE 10 AGENTES DE HOLLYWOOD ==================== -->
+      <!-- ==================== TAB 2: STORYBOARD VISUAL STUDIO v3.0 ==================== -->
+      <section id="tab-storyboard" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-image"></i> Visual Storyboard Studio (Previsualización de Tomas)</h2>
+          <p>Tira cómica de storyboards generados por la red de agentes con encuadres, ángulos y prompts visuales escena por escena.</p>
+        </div>
+
+        <div class="storyboard-grid" id="storyboard-container">
+          <div class="avatar-placeholder-box">
+            <i class="fa-solid fa-images"></i>
+            <p>Genera un proyecto en el Asistente para renderizar el Storyboard Visual de la producción.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 3: PRESUPUESTO & EXPORTACIÓN PRO v3.0 ==================== -->
+      <section id="tab-budget-pro" class="tab-pane">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-calculator"></i> Calculadora de Presupuesto IA & Exportación Pro</h2>
+          <p>Estimaciones de consumo de créditos de IA y herramientas para editores de video profesionales (DaVinci Resolve / Premiere Pro).</p>
+        </div>
+
+        <!-- BUDGET METRICS CARDS -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-microphone"></i></div>
+            <div class="metric-info">
+              <span class="metric-title">Caracteres ElevenLabs</span>
+              <span class="metric-value" id="metric-audio-chars">0 caracteres</span>
+              <span class="metric-sub">~0 min de audio sintético</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-video"></i></div>
+            <div class="metric-info">
+              <span class="metric-title">Tomas Sora / Runway Gen-3</span>
+              <span class="metric-value" id="metric-video-shots">0 tomas</span>
+              <span class="metric-sub">~0 seg de video generativo</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-palette"></i></div>
+            <div class="metric-info">
+              <span class="metric-title">Renders Flux / Midjourney</span>
+              <span class="metric-value" id="metric-image-renders">0 renders</span>
+              <span class="metric-sub">Personajes & Storyboard</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="metric-info">
+              <span class="metric-title">Tiempo Estimado de Render</span>
+              <span class="metric-value" id="metric-render-time">0 min</span>
+              <span class="metric-sub">Generación total</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXPORT PRO BUTTONS ROW -->
+        <div class="export-pro-box mt-4">
+          <h3><i class="fa-solid fa-file-export"></i> Exportación de Archivos Pro para Editores & Publicación</h3>
+          <div class="export-buttons-row">
+            <button id="btn-export-edl" class="btn btn-secondary"><i class="fa-solid fa-film"></i> Exportar DaVinci Resolve EDL (.edl)</button>
+            <button id="btn-export-xml" class="btn btn-secondary"><i class="fa-solid fa-file-code"></i> Exportar Final Cut / Premiere XML (.xml)</button>
+            <button id="btn-export-gpt" class="btn btn-secondary"><i class="fa-solid fa-robot"></i> Exportar Custom GPT Config (.json)</button>
+            <button id="btn-export-promo" class="btn btn-accent"><i class="fa-brands fa-youtube"></i> Exportar Kit YouTube & Blogger (.md)</button>
+          </div>
+        </div>
+
+        <!-- PROMO KIT PREVIEW EDITOR -->
+        <div class="editor-container mt-4">
+          <div class="output-header">
+            <span class="badge"><i class="fa-brands fa-youtube"></i> Kit Promocional de YouTube & Blogger (Títulos SEO, Descripción, Thumbnail Prompt & Post)</span>
+          </div>
+          <textarea id="output-promo-kit" class="code-editor" readonly placeholder="Kit de publicación en YouTube & Blogger..."></textarea>
+        </div>
+      </section>
+
+
+      <!-- ==================== TAB 4: RED DE 10 AGENTES DE HOLLYWOOD ==================== -->
       <section id="tab-agents" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-user-gear"></i> Red Completa de 10 Agentes Especializados de Hollywood</h2>
@@ -329,7 +415,6 @@
 
         <div class="agents-grid">
           
-          <!-- Agent 1 -->
           <div class="agent-card highlight-master">
             <div class="agent-avatar"><i class="fa-solid fa-crown"></i></div>
             <div class="agent-info">
@@ -340,7 +425,6 @@
             </div>
           </div>
 
-          <!-- Agent 2 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-clipboard-check"></i></div>
             <div class="agent-info">
@@ -351,7 +435,6 @@
             </div>
           </div>
 
-          <!-- Agent 3 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-feather-pointed"></i></div>
             <div class="agent-info">
@@ -362,7 +445,6 @@
             </div>
           </div>
 
-          <!-- Agent 4 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-video"></i></div>
             <div class="agent-info">
@@ -373,7 +455,6 @@
             </div>
           </div>
 
-          <!-- Agent 5 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-building-columns"></i></div>
             <div class="agent-info">
@@ -384,7 +465,6 @@
             </div>
           </div>
 
-          <!-- Agent 6 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-shirt"></i></div>
             <div class="agent-info">
@@ -395,7 +475,6 @@
             </div>
           </div>
 
-          <!-- Agent 7 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-paintbrush"></i></div>
             <div class="agent-info">
@@ -406,7 +485,6 @@
             </div>
           </div>
 
-          <!-- Agent 8 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-headphones"></i></div>
             <div class="agent-info">
@@ -417,7 +495,6 @@
             </div>
           </div>
 
-          <!-- Agent 9 -->
           <div class="agent-card">
             <div class="agent-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
             <div class="agent-info">
@@ -428,7 +505,6 @@
             </div>
           </div>
 
-          <!-- Agent 10 -->
           <div class="agent-card highlight-memory">
             <div class="agent-avatar"><i class="fa-solid fa-terminal"></i></div>
             <div class="agent-info">
@@ -443,7 +519,7 @@
       </section>
 
 
-      <!-- ==================== TAB 3: PATRÓN DE MEMORIA CONTINUADA ==================== -->
+      <!-- ==================== TAB 5: PATRÓN DE MEMORIA CONTINUADA ==================== -->
       <section id="tab-memory" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-brain"></i> Patrón de Memoria Continuada para IAs</h2>
@@ -461,7 +537,7 @@
       </section>
 
 
-      <!-- ==================== TAB 4: GUIONES & BIBLIA DEL PROYECTO ==================== -->
+      <!-- ==================== TAB 6: GUIONES & BIBLIA DEL PROYECTO ==================== -->
       <section id="tab-script" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-scroll"></i> Biblia de Producción & Guiones Desglosados</h2>
@@ -479,7 +555,7 @@
       </section>
 
 
-      <!-- ==================== TAB 5: PERSONAJES & ESCENARIOS ==================== -->
+      <!-- ==================== TAB 7: PERSONAJES & ESCENARIOS ==================== -->
       <section id="tab-characters" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-users-viewfinder"></i> Fichas de Personajes & Escenarios</h2>
@@ -488,7 +564,6 @@
           </div>
         </div>
 
-        <!-- VISUAL AVATAR PREVIEW CANVAS GENERATOR -->
         <div class="avatar-preview-section">
           <h3><i class="fa-solid fa-id-card"></i> Vista Previa de Avatares & Referencias Visuales Generadas</h3>
           <div class="avatar-cards-row" id="avatar-cards-container">
@@ -507,90 +582,100 @@
         </div>
       </section>
 
-
-      <!-- ==================== TAB 6: PLANOS DE CÁMARA & AUDIO ==================== -->
-      <section id="tab-camera-audio" class="tab-pane">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-video"></i> Planos de Cámara, Storyboard & Guía de Sonido</h2>
-          <div class="actions">
-            <button class="btn btn-secondary btn-copy" data-target="output-camera"><i class="fa-regular fa-copy"></i> Copiar Especificaciones</button>
-          </div>
-        </div>
-
-        <div class="two-column-editors">
-          <div class="editor-box">
-            <h3><i class="fa-solid fa-camera-retro"></i> Shot List & Planos de Cámara (Runway / Sora / Pika)</h3>
-            <textarea id="output-camera" class="code-editor" readonly placeholder="Especificaciones de ángulos, lentes y movimiento de cámara..."></textarea>
-          </div>
-
-          <div class="editor-box">
-            <h3><i class="fa-solid fa-file-audio"></i> Pautas de Locución (ElevenLabs) & Música</h3>
-            <textarea id="output-audio" class="code-editor" readonly placeholder="Guion con marcas de voz, entonaciones y efectos de sonido..."></textarea>
-          </div>
-        </div>
-      </section>
-
     </main>
 
   </div>
 
-  <!-- ==================== SETTINGS MODAL ==================== -->
+  <!-- ==================== SETTINGS MODAL v3.0 ==================== -->
   <div id="settings-modal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-large">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-sliders"></i> Configuración de Modelos de IA</h3>
+        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & APIs v3.0</h3>
         <button id="btn-close-settings" class="icon-btn-close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
       <div class="modal-body">
         
-        <div class="form-group">
-          <label for="ai-provider"><i class="fa-solid fa-brain"></i> Proveedor de IA Activo</label>
-          <select id="ai-provider" class="form-control">
-            <option value="offline" selected>Motor Interno Inteligente (Offline Mode / Sin API Key)</option>
-            <option value="gemini">Google Gemini API (Gemini 1.5 Pro / Flash)</option>
-            <option value="openai">OpenAI (ChatGPT / GPT-4o)</option>
-            <option value="claude">Anthropic Claude API</option>
-            <option value="openrouter">OpenRouter / Hermes AI</option>
-            <option value="ollama">Ollama (Servidor Local - Llama3/Mistral)</option>
-            <option value="lmstudio">LM Studio (Servidor Local)</option>
-          </select>
+        <div class="settings-nav-tabs">
+          <button class="settings-tab-btn active" data-sec="sec-llm"><i class="fa-solid fa-brain"></i> LLMs & Texto</button>
+          <button class="settings-tab-btn" data-sec="sec-audio"><i class="fa-solid fa-microphone"></i> Audio / ElevenLabs</button>
+          <button class="settings-tab-btn" data-sec="sec-visual"><i class="fa-solid fa-image"></i> Imágenes / ComfyUI</button>
         </div>
 
-        <div class="form-group provider-setting" id="setting-gemini">
-          <label for="gemini-key">API Key de Google Gemini</label>
-          <input type="password" id="gemini-key" class="form-control" placeholder="AIzaSy...">
+        <!-- SECTION: LLMs -->
+        <div class="settings-section active" id="sec-llm">
+          <div class="form-group">
+            <label for="ai-provider"><i class="fa-solid fa-brain"></i> Proveedor Principal Activo</label>
+            <select id="ai-provider" class="form-control">
+              <option value="offline" selected>Motor Interno Inteligente (Offline Mode / Sin API Key)</option>
+              <option value="gemini">Google Gemini API (Gemini 1.5 Pro / Flash)</option>
+              <option value="openai">OpenAI (ChatGPT / GPT-4o)</option>
+              <option value="claude">Anthropic Claude API</option>
+              <option value="openrouter">OpenRouter / Hermes AI</option>
+              <option value="ollama">Ollama (Servidor Local)</option>
+              <option value="lmstudio">LM Studio (Servidor Local)</option>
+            </select>
+          </div>
+
+          <div class="form-grid mt-2">
+            <div class="form-group">
+              <label for="gemini-key">Google Gemini API Key</label>
+              <input type="password" id="gemini-key" class="form-control" placeholder="AIzaSy...">
+            </div>
+            <div class="form-group">
+              <label for="openai-key">OpenAI API Key</label>
+              <input type="password" id="openai-key" class="form-control" placeholder="sk-proj-...">
+            </div>
+            <div class="form-group">
+              <label for="claude-key">Anthropic Claude API Key</label>
+              <input type="password" id="claude-key" class="form-control" placeholder="sk-ant-...">
+            </div>
+            <div class="form-group">
+              <label for="openrouter-key">OpenRouter API Key</label>
+              <input type="password" id="openrouter-key" class="form-control" placeholder="sk-or-v1-...">
+            </div>
+            <div class="form-group">
+              <label for="ollama-url">Ollama Local URL</label>
+              <input type="text" id="ollama-url" class="form-control" value="http://localhost:11434">
+            </div>
+            <div class="form-group">
+              <label for="lmstudio-url">LM Studio Local URL</label>
+              <input type="text" id="lmstudio-url" class="form-control" value="http://localhost:1234">
+            </div>
+          </div>
         </div>
 
-        <div class="form-group provider-setting" id="setting-openai">
-          <label for="openai-key">API Key de OpenAI</label>
-          <input type="password" id="openai-key" class="form-control" placeholder="sk-proj-...">
+        <!-- SECTION: AUDIO -->
+        <div class="settings-section" id="sec-audio">
+          <div class="form-group">
+            <label for="elevenlabs-key"><i class="fa-solid fa-key"></i> ElevenLabs API Key (Síntesis de Voz Pro)</label>
+            <input type="password" id="elevenlabs-key" class="form-control" placeholder="sk_...">
+            <span class="small-hint">Se utiliza para la estimación y síntesis directa de locuciones fotorrealistas.</span>
+          </div>
         </div>
 
-        <div class="form-group provider-setting" id="setting-claude">
-          <label for="claude-key">API Key de Anthropic Claude</label>
-          <input type="password" id="claude-key" class="form-control" placeholder="sk-ant-...">
-        </div>
-
-        <div class="form-group provider-setting" id="setting-openrouter">
-          <label for="openrouter-key">API Key de OpenRouter / Hermes</label>
-          <input type="password" id="openrouter-key" class="form-control" placeholder="sk-or-v1-...">
-        </div>
-
-        <div class="form-group provider-setting" id="setting-ollama">
-          <label for="ollama-url">URL del Servidor Ollama</label>
-          <input type="text" id="ollama-url" class="form-control" value="http://localhost:11434">
-        </div>
-
-        <div class="form-group provider-setting" id="setting-lmstudio">
-          <label for="lmstudio-url">URL del Servidor LM Studio</label>
-          <input type="text" id="lmstudio-url" class="form-control" value="http://localhost:1234">
+        <!-- SECTION: VISUAL -->
+        <div class="settings-section" id="sec-visual">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="flux-key"><i class="fa-solid fa-key"></i> Flux.1 / DALL-E / Stability API Key</label>
+              <input type="password" id="flux-key" class="form-control" placeholder="sk-flux-...">
+            </div>
+            <div class="form-group">
+              <label for="comfy-url"><i class="fa-solid fa-server"></i> ComfyUI Local Server URL</label>
+              <input type="text" id="comfy-url" class="form-control" value="http://127.0.0.1:8188">
+            </div>
+            <div class="form-group">
+              <label for="webui-url"><i class="fa-solid fa-sliders"></i> Automatic1111 / WebUI URL</label>
+              <input type="text" id="webui-url" class="form-control" value="http://127.0.0.1:7860">
+            </div>
+          </div>
         </div>
 
       </div>
 
       <div class="modal-footer">
-        <button id="btn-save-settings" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Configuración</button>
+        <button id="btn-save-settings" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Todas las Conexiones</button>
       </div>
     </div>
   </div>
@@ -599,7 +684,7 @@
   <!-- ==================== FOOTER & CREDITS BAR ==================== -->
   <footer class="app-footer">
     <div class="footer-left">
-      <span>Hollywood Agent Studio v2.0 &copy; 2026</span>
+      <span>Hollywood Agent Studio v3.0 Pro Suite &copy; 2026</span>
       <span class="dot-separator">•</span>
       <span>Desarrollado por <strong><a href="https://christian-freelance.us/" target="_blank" class="credit-link">Christian Herencia</a></strong></span>
     </div>

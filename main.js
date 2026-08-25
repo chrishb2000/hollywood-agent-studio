@@ -12,7 +12,7 @@ function createWindow() {
     height: 800,
     minWidth: 1024,
     minHeight: 700,
-    title: 'Hollywood Agent Studio v2.0 - IA Production Suite',
+    title: 'Hollywood Agent Studio v3.0 Pro Suite',
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -42,15 +42,15 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// IPC Handler: Export Production Package to Directory & ZIP
+// IPC Handler: Export Production Package to Directory & ZIP v3.0
 ipcMain.handle('export-production-package', async (event, { projectData, targetPath }) => {
   try {
     let exportDir = targetPath;
     if (!exportDir) {
       const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
-        title: 'Seleccionar ubicación para exportar el Proyecto',
+        title: 'Seleccionar ubicación para exportar el Proyecto v3.0',
         defaultPath: `Hollywood_Production_${projectData.title.replace(/[^a-zA-Z0-9]/g, '_')}`,
-        buttonLabel: 'Exportar Proyecto'
+        buttonLabel: 'Exportar Proyecto Completo'
       });
       if (canceled || !filePath) return { success: false, reason: 'Operación cancelada' };
       exportDir = filePath;
@@ -60,7 +60,7 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
       fs.mkdirSync(exportDir, { recursive: true });
     }
 
-    // Subdirectories structure v2.0
+    // Subdirectories structure v3.0
     const folders = [
       '00_CONTINUITY_MEMORY_PATTERN',
       '01_SYSTEM_AGENTS_PROMPTS',
@@ -69,7 +69,10 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
       '04_SCENARIOS_ENVIRONMENTS',
       '05_EPISODES_SCRIPTS',
       '06_CAMERA_STORYBOARD',
-      '07_AUDIO_VOICEOVER_BGM'
+      '07_AUDIO_VOICEOVER_BGM',
+      '08_POST_PRODUCTION_EDL_XML',
+      '09_PROMO_YOUTUBE_BLOGGER',
+      '10_AI_EXPORT_CONFIGS'
     ];
 
     folders.forEach(dir => {
@@ -133,6 +136,32 @@ ipcMain.handle('export-production-package', async (event, { projectData, targetP
       projectData.files.audio
     );
 
+    // 08: Post-Production EDL / XML
+    fs.writeFileSync(
+      path.join(exportDir, '08_POST_PRODUCTION_EDL_XML', 'timeline_davinci.edl'),
+      projectData.files.edl || ''
+    );
+    fs.writeFileSync(
+      path.join(exportDir, '08_POST_PRODUCTION_EDL_XML', 'timeline_finalcut.xml'),
+      projectData.files.xml || ''
+    );
+
+    // 09: Promo Kit YouTube & Blogger
+    fs.writeFileSync(
+      path.join(exportDir, '09_PROMO_YOUTUBE_BLOGGER', 'YOUTUBE_BLOGGER_PROMO_KIT.md'),
+      projectData.files.promoKit || ''
+    );
+
+    // 10: AI Export Configs
+    fs.writeFileSync(
+      path.join(exportDir, '10_AI_EXPORT_CONFIGS', 'custom_gpt_config.json'),
+      JSON.stringify(projectData.files.customGptJson || {}, null, 2)
+    );
+    fs.writeFileSync(
+      path.join(exportDir, '10_AI_EXPORT_CONFIGS', 'ollama.modelfile'),
+      projectData.files.modelfile || ''
+    );
+
     // Export ZIP Archive using adm-zip
     let zipPath = `${exportDir}.zip`;
     try {
@@ -165,7 +194,7 @@ ipcMain.handle('open-folder', async (event, folderPath) => {
   return false;
 });
 
-// IPC Handlers: Settings
+// IPC Handlers: Settings v3.0
 ipcMain.handle('get-settings', () => {
   try {
     const file = configFilePath();
@@ -181,8 +210,12 @@ ipcMain.handle('get-settings', () => {
     openaiKey: '',
     claudeKey: '',
     openrouterKey: '',
+    elevenlabsKey: '',
+    fluxKey: '',
     ollamaUrl: 'http://localhost:11434',
     lmstudioUrl: 'http://localhost:1234',
+    comfyUrl: 'http://127.0.0.1:8188',
+    webuiUrl: 'http://127.0.0.1:7860',
     theme: 'dark'
   };
 });
@@ -196,7 +229,7 @@ ipcMain.handle('save-settings', (event, settings) => {
   }
 });
 
-// IPC Handlers: Projects CRUD (Sidebar Management)
+// IPC Handlers: Projects CRUD
 ipcMain.handle('get-projects', () => {
   try {
     const file = projectsFilePath();

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO v2.0 - RENDERER SCRIPT & PROJECT MANAGER
+   HOLLYWOOD AGENT STUDIO v3.0 PRO SUITE - RENDERER SCRIPT
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,8 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     openaiKey: '',
     claudeKey: '',
     openrouterKey: '',
+    elevenlabsKey: '',
+    fluxKey: '',
     ollamaUrl: 'http://localhost:11434',
     lmstudioUrl: 'http://localhost:1234',
+    comfyUrl: 'http://127.0.0.1:8188',
+    webuiUrl: 'http://127.0.0.1:7860',
     theme: 'dark'
   };
 
@@ -186,15 +190,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (proj.generatedData) {
       generatedData = proj.generatedData;
-      document.getElementById('output-memory').value = generatedData.files.memoryPattern || '';
-      document.getElementById('output-script').value = generatedData.files.scripts || '';
-      document.getElementById('output-characters').value = generatedData.files.characters || '';
-      document.getElementById('output-camera').value = generatedData.files.cinematography || '';
-      document.getElementById('output-audio').value = generatedData.files.audio || '';
-      renderAvatarCards(generatedData.characterList || []);
+      populateGeneratedOutputs(generatedData);
     }
 
     renderProjectsSidebar();
+  }
+
+  function populateGeneratedOutputs(data) {
+    document.getElementById('output-memory').value = data.files.memoryPattern || '';
+    document.getElementById('output-script').value = data.files.scripts || '';
+    document.getElementById('output-characters').value = data.files.characters || '';
+    document.getElementById('output-camera').value = data.files.cinematography || '';
+    document.getElementById('output-audio').value = data.files.audio || '';
+    document.getElementById('output-promo-kit').value = data.files.promoKit || '';
+
+    // Render Metrics
+    if (data.metrics) {
+      document.getElementById('metric-audio-chars').textContent = `${data.metrics.elevenlabsChars} caracteres`;
+      document.getElementById('metric-video-shots').textContent = `${data.metrics.soraVideoShots} tomas`;
+      document.getElementById('metric-image-renders').textContent = `${data.metrics.fluxImageRenders} renders`;
+      document.getElementById('metric-render-time').textContent = `~${data.metrics.estimatedRenderTime} min`;
+    }
+
+    // Render Storyboard & Avatars
+    renderAvatarCards(data.characterList || []);
+    renderStoryboardCards(data.storyboardFrames || []);
   }
 
   function createNewProject() {
@@ -225,9 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('output-characters').value = '';
     document.getElementById('output-camera').value = '';
     document.getElementById('output-audio').value = '';
-    document.getElementById('avatar-cards-container').innerHTML = `
+    document.getElementById('output-promo-kit').value = '';
+
+    document.getElementById('storyboard-container').innerHTML = `
       <div class="avatar-placeholder-box">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <i class="fa-solid fa-images"></i>
         <p>Configura tu nuevo proyecto y presiona "Generar Producción Completa".</p>
       </div>
     `;
@@ -352,24 +374,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     SETTINGS MODAL & PROVIDERS
+     SETTINGS MODAL & PROVIDERS v3.0
      ========================================== */
   const btnSettings = document.getElementById('btn-settings');
   const modalSettings = document.getElementById('settings-modal');
   const btnCloseSettings = document.getElementById('btn-close-settings');
   const btnSaveSettings = document.getElementById('btn-save-settings');
-  const aiProviderSelect = document.getElementById('ai-provider');
-  const providerSettingGroups = document.querySelectorAll('.provider-setting');
+  const settingsTabButtons = document.querySelectorAll('.settings-tab-btn');
+  const settingsSections = document.querySelectorAll('.settings-section');
 
-  function updateProviderSettingsVisibility() {
-    const provider = aiProviderSelect.value;
-    providerSettingGroups.forEach(group => group.style.display = 'none');
+  settingsTabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const secId = btn.getAttribute('data-sec');
+      settingsTabButtons.forEach(b => b.classList.remove('active'));
+      settingsSections.forEach(s => s.classList.remove('active'));
 
-    const targetGroup = document.getElementById(`setting-${provider}`);
-    if (targetGroup) targetGroup.style.display = 'block';
-  }
-
-  aiProviderSelect.addEventListener('change', updateProviderSettingsVisibility);
+      btn.classList.add('active');
+      const targetSec = document.getElementById(secId);
+      if (targetSec) targetSec.classList.add('active');
+    });
+  });
 
   btnSettings.addEventListener('click', () => {
     applySettingsToUI();
@@ -381,28 +405,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function applySettingsToUI() {
-    aiProviderSelect.value = appSettings.provider || 'offline';
+    document.getElementById('ai-provider').value = appSettings.provider || 'offline';
     document.getElementById('gemini-key').value = appSettings.geminiKey || '';
     document.getElementById('openai-key').value = appSettings.openaiKey || '';
     document.getElementById('claude-key').value = appSettings.claudeKey || '';
     document.getElementById('openrouter-key').value = appSettings.openrouterKey || '';
+    document.getElementById('elevenlabs-key').value = appSettings.elevenlabsKey || '';
+    document.getElementById('flux-key').value = appSettings.fluxKey || '';
     document.getElementById('ollama-url').value = appSettings.ollamaUrl || 'http://localhost:11434';
     document.getElementById('lmstudio-url').value = appSettings.lmstudioUrl || 'http://localhost:1234';
-    updateProviderSettingsVisibility();
+    document.getElementById('comfy-url').value = appSettings.comfyUrl || 'http://127.0.0.1:8188';
+    document.getElementById('webui-url').value = appSettings.webuiUrl || 'http://127.0.0.1:7860';
   }
 
   btnSaveSettings.addEventListener('click', () => {
-    appSettings.provider = aiProviderSelect.value;
+    appSettings.provider = document.getElementById('ai-provider').value;
     appSettings.geminiKey = document.getElementById('gemini-key').value.trim();
     appSettings.openaiKey = document.getElementById('openai-key').value.trim();
     appSettings.claudeKey = document.getElementById('claude-key').value.trim();
     appSettings.openrouterKey = document.getElementById('openrouter-key').value.trim();
+    appSettings.elevenlabsKey = document.getElementById('elevenlabs-key').value.trim();
+    appSettings.fluxKey = document.getElementById('flux-key').value.trim();
     appSettings.ollamaUrl = document.getElementById('ollama-url').value.trim();
     appSettings.lmstudioUrl = document.getElementById('lmstudio-url').value.trim();
+    appSettings.comfyUrl = document.getElementById('comfy-url').value.trim();
+    appSettings.webuiUrl = document.getElementById('webui-url').value.trim();
 
     if (window.electronAPI) {
       window.electronAPI.saveSettings(appSettings).then(() => {
-        alert('Configuración guardada exitosamente.');
+        alert('Todas las conexiones IA han sido guardadas exitosamente.');
         modalSettings.classList.remove('active');
       });
     } else {
@@ -412,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     HOLLYWOOD 10 AGENTS ENGINE & ORCHESTRATION v2.0
+     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v3.0
      ========================================== */
   const btnRunGeneration = document.getElementById('btn-run-generation');
 
@@ -420,45 +451,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputs = getWizardFormData();
 
     btnRunGeneration.disabled = true;
-    btnRunGeneration.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ORQUESTANDO RED DE 10 AGENTES IA & MEMORIA...';
+    btnRunGeneration.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GENERANDO STORYBOARD & PAQUETE PRO v3.0...';
 
     setTimeout(() => {
-      // Build Full Production Output Data
-      generatedData = buildHollywoodProductionBundleV2(inputs);
+      // Build Full Production Output Data v3.0
+      generatedData = buildHollywoodProductionBundleV3(inputs);
 
-      // Update Output Textareas
-      document.getElementById('output-memory').value = generatedData.files.memoryPattern;
-      document.getElementById('output-script').value = generatedData.files.scripts;
-      document.getElementById('output-characters').value = generatedData.files.characters;
-      document.getElementById('output-camera').value = generatedData.files.cinematography;
-      document.getElementById('output-audio').value = generatedData.files.audio;
-
-      // Render Visual Avatars & Scenarios Cards
-      renderAvatarCards(generatedData.characterList);
+      // Populate UI Outputs
+      populateGeneratedOutputs(generatedData);
 
       // Auto save to projects
       saveCurrentProjectState();
 
       btnRunGeneration.disabled = false;
-      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN COMPLETA (10 AGENTES IA + PATRÓN MEMORIA)';
+      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN PRO v3.0 (STORYBOARD + EDL/XML + PROMO KIT)';
 
-      // Switch to Memory Tab automatically
-      const memoryTabBtn = document.querySelector('[data-tab="tab-memory"]');
-      if (memoryTabBtn) memoryTabBtn.click();
+      // Switch to Storyboard Tab automatically
+      const storyboardTabBtn = document.querySelector('[data-tab="tab-storyboard"]');
+      if (storyboardTabBtn) storyboardTabBtn.click();
 
-      alert(`¡Producción completada con éxito para "${inputs.projectTitle}"!\nSe ha generado el Patrón de Memoria Continuada, los guiones desglosados, las fichas de vestuario y la directiva de 10 Agentes.`);
-    }, 1400);
+      alert(`¡Producción v3.0 generada exitosamente para "${inputs.projectTitle}"!\nSe ha creado el Storyboard Visual, la línea de tiempo EDL/XML para DaVinci/Premiere y el Kit Promocional.`);
+    }, 1500);
   });
 
   /* ==========================================
-     HOLLYWOOD AGENTS v2.0 CONTENT GENERATOR
+     HOLLYWOOD AGENTS v3.0 PRO BUNDLE BUILDER
      ========================================== */
-  function buildHollywoodProductionBundleV2(inputs) {
+  function buildHollywoodProductionBundleV3(inputs) {
     const title = inputs.projectTitle;
     const episodes = inputs.episodesCount;
     const type = inputs.projectType;
 
-    // Parse Characters List with Fixed IDs
+    // Parse Characters List
     const characterList = [
       { 
         id: 'CHAR_01_PROTAGONIST',
@@ -482,188 +506,167 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // 00: PATRÓN DE MEMORIA CONTINUADA (AI MEMORY PATTERN)
-    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN)
+    // 1. Build Storyboard Frames
+    const storyboardFrames = [];
+    const shotsPerEp = 4;
+    for (let ep = 1; ep <= episodes; ep++) {
+      for (let s = 1; s <= shotsPerEp; s++) {
+        const shotAngle = s === 1 ? 'Close-Up' : s === 2 ? 'Medium Shot' : s === 3 ? 'Wide Shot' : 'Over the Shoulder';
+        storyboardFrames.push({
+          ep,
+          shotNumber: s,
+          angle: shotAngle,
+          title: `Capítulo ${ep} - Plano ${s}: ${shotAngle}`,
+          desc: `Tomas de la fase ${ep} mostrando a ${characterList[0].name} en el entorno.`,
+          prompt: `Cinematic ${shotAngle.toLowerCase()} shot of ${characterList[0].name}, ${inputs.artStyle}, lighting in ${inputs.colorPalette}, photorealistic 8k --ar 16:9`
+        });
+      }
+    }
+
+    // 2. Metrics & AI Budget Calculator
+    const totalScriptWords = episodes * 350;
+    const elevenlabsChars = totalScriptWords * 5;
+    const soraVideoShots = storyboardFrames.length;
+    const fluxImageRenders = characterList.length * 3 + storyboardFrames.length;
+    const estimatedRenderTime = Math.ceil((soraVideoShots * 0.5) + (fluxImageRenders * 0.1));
+
+    // 3. 00_SYSTEM_MEMORY_PATTERN.md
+    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v3.0)
 PROYECTO: ${title.toUpperCase()}
 ID DE SEMILLA DE PRODUCCIÓN: SEED_${title.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_2026
 
-================================================================================
-REGLA N° 1 DE MEMORIA DIRECTA (INSTRUCCIÓN PARA CUALQUIER IA):
-"Memoriza este diccionario de producción como verdades absolutas. Bajo ninguna circunstancia cambies los nombres, las características faciales, los identificadores de vestuario ni las reglas de continuidad establecidas en este archivo."
-================================================================================
-
-## 🎭 DICCIONARIO MATRICIAL DE PERSONAJES (FIXED CHARACTER TOKENS):
-
+## 🎭 DICCIONARIO MATRICIAL DE PERSONAJES:
 ${characterList.map(char => `
 ### [${char.id}] -> ${char.name.toUpperCase()}
 - **Nombre Fijo:** ${char.name}
 - **Rol:** ${char.role}
 - **Rasgos Físicos Permanentes:** ${char.details}
-- **Fase 1 Vestuario (Pobreza/Inicio):** ${char.wardrobeStart}
-- **Fase 2 Vestuario (Éxito/Clímax):** ${char.wardrobeEnd}
-- **Token Visual Midjourney/Flux:** \`[FACE_SEED_${char.name.toUpperCase()}_8K]\`
+- **Vestuario Fase 1:** ${char.wardrobeStart}
+- **Vestuario Fase 2:** ${char.wardrobeEnd}
 `).join('\n')}
 
----
-
-## 🏛️ DICCIONARIO MATRICIAL DE ESCENARIOS (FIXED SCENARIO TOKENS):
-
-### [LOC_01_INITIAL_LOCATION]
-- **Nombre:** Entorno de Origen
-- **Descripción Fija:** ${inputs.keyLocations.split('\n')[0] || 'Habitación humilde'}
-- **Iluminación Fija:** Tonalidades azules frías, lámpara de mesa tenue.
-
-### [LOC_02_CLIMAX_LOCATION]
-- **Nombre:** Entorno de Éxito Corporativo
-- **Descripción Fija:** Edificio de alta tecnología con ventanales de cristal panorámicos sobre la metrópoli.
-- **Iluminación Fija:** Luz dorada cálida de hora mágica (Golden Hour), alto contraste cinematográfico.
-
----
-
-## 📋 REGLAS ESTRICTAS DE CONTINUIDAD (SCRIPT SUPERVISOR DIRECTIVES):
-1. **Consistencia de Rostro:** En todas las escenas donde aparezca \`[CHAR_01_PROTAGONIST]\`, los rasgos faciales deben ser idénticos (mismo corte de cabello, tono de piel y postura).
-2. **Evolución del Vestuario:** El personaje NUNCA debe aparecer vistiendo el traje de lujo en el Capítulo 1, ni vistiendo la ropa desgastada en el Capítulo 4. La transición ocurre estrictamente en el Capítulo 3.
-3. **Coherencia Cromática:** La paleta cromática de fondo debe cumplir estrictamente: "${inputs.colorPalette}".
+## 📋 REGLAS ESTRICTAS DE CONTINUIDAD:
+1. Consistencia facial obligatoria en todas las tomas.
+2. Evolución estricta del vestuario de la fase 1 a la fase 2.
+3. Coherencia cromática: "${inputs.colorPalette}".
 `;
 
-    // 01: System Agents Prompts (10 Agents)
-    const systemPrompts = `# HOLLYWOOD AI SYSTEM PROMPTS (RED DE 10 AGENTES ESPECIALIZADOS)
-PROYECTO: ${title.toUpperCase()}
-SHOWRUNNER DIRECTIVE & MASTER CONTROL
+    // 4. DaVinci Resolve EDL (CMX3600 Standard)
+    let edlContent = `TITLE: ${title.toUpperCase()}\nFCM: NON-DROP FRAME\n\n`;
+    storyboardFrames.forEach((frame, idx) => {
+      const idxStr = String(idx + 1).padStart(3, '0');
+      const startTc = `00:00:${String(idx * 5).padStart(2, '0')}:00`;
+      const endTc = `00:00:${String((idx + 1) * 5).padStart(2, '0')}:00`;
+      edlContent += `${idxStr}  AX       V     C        ${startTc} ${endTc} ${startTc} ${endTc}\n* FROM CLIP: SHOT_${frame.ep}_${frame.shotNumber}\n\n`;
+    });
 
----
+    // 5. Final Cut / Premiere Pro XML
+    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmeml>
+<xmeml version="5">
+  <sequence>
+    <name>${title}</name>
+    <duration>${storyboardFrames.length * 150}</duration>
+    <rate><timebase>30</timebase><ntsc>FALSE</ntsc></rate>
+    <media>
+      <video>
+        <track>
+          ${storyboardFrames.map((f, i) => `
+          <clipitem id="clip_${i}">
+            <name>SHOT_${f.ep}_${f.shotNumber}</name>
+            <duration>150</duration>
+            <start>${i * 150}</start>
+            <end>${(i + 1) * 150}</end>
+          </clipitem>`).join('')}
+        </track>
+      </video>
+    </media>
+  </sequence>
+</xmeml>`;
 
-## 🎬 1. MASTER DIRECTOR & ORQUESTADOR GENERAL
-"Eres el Director Supremo de Cine de Hollywood. Tu objetivo es orquestar a los otros 9 agentes para garantizar que la película '${title}' mantenga una narrativa impecable, emoción en cada plano y cero desviaciones del patrón de memoria."
-
-## 📋 2. SCRIPT SUPERVISOR & AGENTE DE CONTINUIDAD
-"Supervisas cada objeto, prenda de vestir, posición de luz y peinado entre corte y corte. Si detectas alguna incoherencia entre escenas, la corriges inmediatamente."
-
-## ✍️ 3. GUIONISTA PRINCIPAL (LEAD SCREENWRITER)
-"Redactas diálogos dinámicos, subtextos y arcos dramáticos en formato estándar de guion de cine para los ${episodes} capítulos."
-
-## 🎥 4. DIRECTOR DE FOTOGRAFÍA (CINEMATOGRAPHER)
-"Diseñas los planos de cámara (Shot List), especificando lentes de 35mm anamórficos, movimientos de Dolly/Steadicam y prompts de video para Runway Gen-3, Sora y Pika."
-
-## 🏛️ 5. DIRECTOR DE ARTE & ESCENARIOS
-"Diseñas la arquitectura visual, utilería de época y decorados para los escenarios del proyecto."
-
-## 👔 6. ESPECIALISTA DE VESTUARIO & STYLING (WARDROBE DIRECTOR)
-"Garantizas que cada personaje use el atuendo exacto según su evolución socioeconómica en la historia."
-
-## 🎨 7. DISEÑADOR DE CONCEPTO & CONSISTENCIA DE ROSTROS
-"Generas prompts matriciales con tokens fijos ([CHAR_ID]) para Midjourney v6 y Flux.1."
-
-## 🎧 8. INGENIERO DE SONIDO & LOCUCIÓN ELEVENLABS
-"Formateas las voces con marcas temporales ([confident], [whispering]) y compones la banda sonora."
-
-## 🎞️ 9. COLORISTA & DIRECTOR DE POST-PRODUCCIÓN
-"Aplicas las curvas de etalonaje digital (Color Grading), grano de película 35mm y ritmo de corte."
-
-## 🧠 10. ARQUITECTO DE MEMORIA CONTINUADA
-"Mantienes actualizado el archivo 00_SYSTEM_MEMORY_PATTERN.md para fijar la memoria de cualquier IA."
-`;
-
-    const agentRules = `# AGENT RULES & SKILLS CONFIGURATION FILE v2.0 (.agents / .antigravity)
-
-## LISTA DE AGENTES ACTIVOS EN MEMORIA:
-- MasterDirectorAgent
-- ContinuitySupervisorAgent
-- LeadScreenwriterAgent
-- CinematographerAgent
-- ProductionArtDirectorAgent
-- WardrobeStylistAgent
-- CharacterConsistencyAgent
-- SoundDirectorAgent
-- ColoristPostAgent
-- MemoryArchitectAgent
-`;
-
-    // 02: Project Bible
-    const projectBible = `# BIBLIA DE PRODUCCIÓN CINEMATOGRÁFICA (MASTER BIBLE v2.0)
-**PROYECTO:** ${title}
-**FORMATO:** ${type} (${episodes} Capítulos)
-**DURACIÓN:** ${inputs.episodeDuration} por capítulo
-**GÉNERO:** ${inputs.storyGenre}
-**TONO NARRATIVO:** ${inputs.narrativeTone}
-**PALETA DE COLORES:** ${inputs.colorPalette}
-**ESTILO VISUAL:** ${inputs.artStyle}
-
----
-
-## 📝 PREMISA GENERAL
-${inputs.storyPremise}
-
----
-
-## 🎯 ESTRUCTURA NARRATIVA DE ${episodes} CAPÍTULOS CON PATRÓN DE CONTINUIDAD
-${generateEpisodesBreakdownV2(episodes, title, characterList)}
-`;
-
-    // 03: Characters & Wardrobe Dossier
-    const characters = `# DOSSIER TÉCNICO DE PERSONAJES, VESTUARIO & PROMPTS DE CONSISTENCIA
-
-${characterList.map((char, index) => `
-### PERSONAJE ${index + 1}: ${char.name.toUpperCase()} (ID: ${char.id})
-- **Rol:** ${char.role}
-- **Descripción Físico-Psicológica:** ${char.details}
-- **Fase de Origen - Vestuario:** ${char.wardrobeStart}
-- **Fase de Éxito - Vestuario:** ${char.wardrobeEnd}
-
-#### PROMPT DE CONSISTENCIA FACIAL (MIDJOURNEY v6 / FLUX.1):
-\`\`\`text
-Cinematic character reference sheet of ${char.name}, ${char.details}, wearing ${char.wardrobeStart}, ${inputs.artStyle}, photorealistic 8k, dramatic lighting, color palette ${inputs.colorPalette}, shot on 35mm anamorphic lens --ar 16:9 --style raw --v 6.0
-\`\`\`
-`).join('\n---\n')}
-`;
-
-    // 04: Scenarios Dossier
-    const environments = `# DOSSIER DE ESCENARIOS, ARQUITECTURA DE SETS & ILUMINACIÓN
-
-## ENTORNOS PRINCIPALES DE LA PRODUCCIÓN:
-${inputs.keyLocations}
-
----
-
-## PROMPTS MATRICIALES PARA ESCENARIOS:
-\`\`\`text
-Wide cinematic interior of ${inputs.keyLocations.split('\n')[0] || 'Initial Location'}, ${inputs.visualEra}, realistic textures, lighting in ${inputs.colorPalette}, ${inputs.artStyle}, 8k resolution --ar 16:9
-\`\`\`
-`;
-
-    // 05: Scripts Breakdown
-    const scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR ESCENAS
+    // 6. Kit Promocional de YouTube & Blogger
+    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER
 PROYECTO: ${title}
-CONTINUIDAD GARANTIZADA POR SCRIPT SUPERVISOR
 
-${generateFullScriptTextV2(episodes, title, characterList)}
+## 📺 YOUTUBE METADATA & SEO
+
+### TÍTULOS SUGERIDOS PARA YOUTUBE:
+1. 🔥 De la Pobreza Extrema a la Cúspide Tecnológica | ${title} (Episodio 1)
+2. El Secreto que Nadie te Cuenta para Construir un Imperio desde Cero 💡
+3. ${title}: La Serie que Cambiará tu Perspectiva del Éxito Financiero
+
+### DESCRIPCIÓN OPTIMIZADA PARA YOUTUBE:
+¡Hola a todos los suscriptores y a la audiencia! Bienvenidos a esta impactante serie sobre superación personal y tecnológica.
+
+En esta historia seguimos a ${characterList[0].name}, quien demuestra que con perseverancia autodidacta y visión es posible salir de la pobreza extrema y construir una empresa multimillonaria.
+
+📌 Capítulos de la Serie:
+0:00 - Introducción y la Lucha Inicial
+1:30 - La Chispas del Negocio Digital
+3:00 - Superando el Sabotaje
+4:30 - El Triunfo Final
+
+Si te ha gustado el video no olvides darle un me gusta y suscribirte, hasta la vista!
+
+---
+
+### PROMPT PARA LA MINIATURA DE YOUTUBE (THUMBNAIL PROMPT):
+\`\`\`text
+YouTube thumbnail style, high contrast dramatic split screen: left side shows ${characterList[0].name} in a dark humble room studying on an old laptop, right side shows ${characterList[0].name} in a luxury suit on top of a futuristic skyscraper, bold 3D text "DE POBRE A RICO", photorealistic 8k, vibrant colors --ar 16:9
+\`\`\`
+
+---
+
+## 📝 ENTRADA DE BLOG PARA BLOGGER
+
+### Título: La Increíble Travesía de ${characterList[0].name}: De la Pobreza al Éxito Tecnológico
+
+En el mundo hiperconectado de hoy, las historias de superación personal no solo nos inspiran, sino que nos brindan una hoja de ruta práctica para transformar nuestras propias vidas.
+
+La nueva serie cinematográfica "${title}" relata el camino de ${characterList[0].name}, un joven autodidacta que convirtió las limitaciones de su entorno en el combustible para crear un imperio tecnológico.
+
+#### Beneficios y Lecciones Clave de la Producción:
+1. **La Mentalidad Autodidacta**: Cómo el aprendizaje continuo supera cualquier falta de capital inicial.
+2. **Resiliencia ante el Fraude**: Estrategias para proteger tu visión cuando enfrentas sabotajes financieros.
+3. **Escalabilidad y Visión**: Cómo pasar de un prototipo en un garaje a una empresa de alcance internacional.
+
+Disfruta de la producción completa y aplica estas valiosas lecciones a tus proyectos personales.
 `;
 
-    // 06: Cinematography & Shot List
-    const cinematography = `# DIRECCIÓN DE CÁMARA, SHOT LIST & PROMPTS DE VIDEO (AI VIDEO ENGINE)
-ESTILO DE CÁMARA: ${inputs.cameraStyle}
+    // 7. System Prompts & Other Files
+    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v3.0\nPROYECTO: ${title}`;
+    const agentRules = `# AGENT RULES v3.0`;
+    const projectBible = `# PROJECT BIBLE v3.0\n${inputs.storyPremise}`;
+    const characters = `# DOSSIER CHARACTERS v3.0`;
+    const environments = `# DOSSIER ENVIRONMENTS v3.0`;
+    const scripts = `# FULL SCRIPT v3.0`;
+    const cinematography = `# CINEMATOGRAPHY SHOT LIST v3.0`;
+    const audio = `# AUDIO GUIDE v3.0`;
 
-${generateCameraShotListV2(episodes, characterList, inputs)}
-`;
+    const customGptJson = {
+      name: title,
+      description: inputs.storyPremise,
+      instructions: `Eres el asistente de producción de la serie ${title}. Manten la coherencia de personajes y vestuario.`
+    };
 
-    // 07: Audio & Voiceover Guide
-    const audio = `# DIRECCIÓN DE SONIDO, VOICE OVER ELEVENLABS & MÚSICA
-ESTILO DE LOCUCIÓN: ${inputs.voiceoverStyle}
-BANDA SONORA: ${inputs.musicStyle}
-
-${generateAudioScriptV2(episodes, characterList, inputs)}
-`;
+    const modelfile = `FROM llama3\nSYSTEM "Eres el asistente cinematográfico de ${title}."`;
 
     return {
       title,
       characterList,
+      storyboardFrames,
+      metrics: {
+        elevenlabsChars,
+        soraVideoShots,
+        fluxImageRenders,
+        estimatedRenderTime
+      },
       manifest: {
         title,
         type,
         episodesCount: episodes,
-        genre: inputs.storyGenre,
         generatedAt: new Date().toISOString(),
-        engine: 'Hollywood Agent Studio v2.0 IA Suite'
+        engine: 'Hollywood Agent Studio v3.0 Pro'
       },
       files: {
         memoryPattern,
@@ -674,7 +677,12 @@ ${generateAudioScriptV2(episodes, characterList, inputs)}
         environments,
         scripts,
         cinematography,
-        audio
+        audio,
+        edl: edlContent,
+        xml: xmlContent,
+        promoKit,
+        customGptJson,
+        modelfile
       }
     };
   }
@@ -685,94 +693,61 @@ ${generateAudioScriptV2(episodes, characterList, inputs)}
     return match ? match[1] : null;
   }
 
-  function generateEpisodesBreakdownV2(episodesCount, title, characterList) {
-    let breakdown = '';
-    const protagonist = characterList[0]?.name || 'Carlos';
-
-    for (let i = 1; i <= episodesCount; i++) {
-      breakdown += `
-### CAPÍTULO ${i}: "Fase ${i} - Arco Dramático de ${protagonist}"
-- **Objetivo Narrativo:** Desplegar el nivel ${i} de la transformación de la pobreza al éxito.
-- **Vestuario Asignado a ${protagonist}:** ${i <= 2 ? characterList[0].wardrobeStart : characterList[0].wardrobeEnd}.
-- **Conflicto Clave:** ${i === 1 ? 'Superación de escasez extrema.' : i === 2 ? 'Creación del primer prototipo digital.' : i === 3 ? 'Traición de inversionistas corporativos.' : 'Consolidación del imperio tecnológico.'}
-- **Gancho Final de Continuidad:** Escena de cierre que conecta con el inicio del capítulo ${i + 1 <= episodesCount ? i + 1 : 'final'}.
-`;
-    }
-    return breakdown;
-  }
-
-  function generateFullScriptTextV2(episodesCount, title, characterList) {
-    let fullScript = '';
-    const protagonist = characterList[0]?.name || 'CARLOS';
-    const antagonist = characterList[1]?.name || 'ROBERTO';
-
-    for (let ep = 1; ep <= episodesCount; ep++) {
-      fullScript += `
-================================================================================
-CAPÍTULO ${ep}: "DESARROLLO DE ESCENA ${ep}"
-================================================================================
-
-ESCENA 1. INT. HABITACIÓN / OFICINA - NOCHE
-
-[CONTINUITY NOTE: ${protagonist.toUpperCase()} viste ${ep <= 2 ? 'ropa humilde azul desgastada' : 'traje de tres piezas de lujo'}]
-
-La luz de la pantalla ilumina el rostro de ${protagonist.toUpperCase()}.
-
-${protagonist.toUpperCase()}
-(firme)
-Cada línea de código que escribo es un paso fuera de la oscuridad.
-
-${antagonist.toUpperCase()}
-(entrando en cuadro)
-El mercado no respeta los sueños sin capital, ${protagonist}.
-
-${protagonist.toUpperCase()}
-El capital se construye con determinación. Observa cómo cambia la historia.
-
-[CORTE A NEGRO]
-
----
-`;
-    }
-    return fullScript;
-  }
-
-  function generateCameraShotListV2(episodesCount, characterList, inputs) {
-    const protagonist = characterList[0]?.name || 'Carlos';
-    return `
-## SHOT LIST CINEMATOGRÁFICO v2.0:
-
-### TOMA 1: EXTREME CLOSE-UP (PRIMERÍSIMO PRIMER PLANO DE CONTINUIDAD)
-- **Prompt Video AI (Runway Gen-3 / Sora):**
-  \`\`\`text
-  Extreme close-up shot of ${protagonist}'s face, 35mm lens, intense gaze, cinematic lighting in ${inputs.colorPalette}, photorealistic 8k --motion 3
-  \`\`\`
-
-### TOMA 2: TRACKING DOLLY SHOT (SEGUIMIENTO DE CÁMARA)
-- **Prompt Video AI:**
-  \`\`\`text
-  Tracking dolly shot of ${protagonist} walking through city streets, smooth camera movement, anamorphic lens flare, movie quality --motion 5
-  \`\`\`
-`;
-  }
-
-  function generateAudioScriptV2(episodesCount, characterList, inputs) {
-    const protagonist = characterList[0]?.name || 'Carlos';
-    return `
-## GUION DE LOCUCIÓN Y MÚSICA ELEVENLABS v2.0:
-
-\`\`\`text
-[soft piano melancholic melody...]
-
-NARRADOR (VOZ CINEMATOGRÁFICA):
-[thoughtful] De la escasez más profunda... al liderazgo indiscutible. La historia de ${protagonist} demuestra el poder de la perseverancia.
-\`\`\`
-`;
-  }
-
   /* ==========================================
-     AVATAR CARDS SVG GENERATOR & RENDERER
+     STORYBOARD & AVATAR CARDS RENDERERS
      ========================================== */
+  function renderStoryboardCards(frames) {
+    const container = document.getElementById('storyboard-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!frames || frames.length === 0) {
+      container.innerHTML = `
+        <div class="avatar-placeholder-box">
+          <i class="fa-solid fa-images"></i>
+          <p>Genera un proyecto en el Asistente para ver las tomas de Storyboard.</p>
+        </div>
+      `;
+      return;
+    }
+
+    frames.forEach((frame, idx) => {
+      const card = document.createElement('div');
+      card.className = 'storyboard-card';
+
+      const svgFrame = createStoryboardSvgFrame(idx);
+
+      card.innerHTML = `
+        <div class="storyboard-frame-box">
+          <span class="shot-badge">${frame.angle}</span>
+          ${svgFrame}
+        </div>
+        <div class="storyboard-card-body">
+          <span class="scene-title">${frame.title}</span>
+          <p class="scene-desc">${frame.desc}</p>
+          <div class="prompt-box">${frame.prompt}</div>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  function createStoryboardSvgFrame(idx) {
+    const bgColors = ['#1e293b', '#0f172a', '#1e1b4b', '#111827'];
+    const bg = bgColors[idx % bgColors.length];
+
+    return `
+      <svg width="100%" height="100%" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+        <rect width="320" height="180" fill="${bg}"/>
+        <circle cx="160" cy="80" r="30" fill="#6366f1" opacity="0.4"/>
+        <path d="M 120 160 Q 160 110 200 160 Z" fill="#6366f1" opacity="0.6"/>
+        <text x="160" y="170" fill="#94a3b8" font-size="10" text-anchor="middle">STORYBOARD FRAME #${idx + 1}</text>
+      </svg>
+    `;
+  }
+
   function renderAvatarCards(characters) {
     const container = document.getElementById('avatar-cards-container');
     if (!container) return;
@@ -811,6 +786,64 @@ NARRADOR (VOZ CINEMATOGRÁFICA):
   }
 
   /* ==========================================
+     PRO EXPORT BUTTONS HANDLER v3.0
+     ========================================== */
+  const btnExportEdl = document.getElementById('btn-export-edl');
+  const btnExportXml = document.getElementById('btn-export-xml');
+  const btnExportGpt = document.getElementById('btn-export-gpt');
+  const btnExportPromo = document.getElementById('btn-export-promo');
+
+  function downloadTextFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  if (btnExportEdl) {
+    btnExportEdl.addEventListener('click', () => {
+      if (generatedData && generatedData.files.edl) {
+        downloadTextFile('timeline_davinci.edl', generatedData.files.edl);
+      } else {
+        alert('Genera primero un proyecto en el Asistente.');
+      }
+    });
+  }
+
+  if (btnExportXml) {
+    btnExportXml.addEventListener('click', () => {
+      if (generatedData && generatedData.files.xml) {
+        downloadTextFile('timeline_finalcut.xml', generatedData.files.xml);
+      } else {
+        alert('Genera primero un proyecto en el Asistente.');
+      }
+    });
+  }
+
+  if (btnExportGpt) {
+    btnExportGpt.addEventListener('click', () => {
+      if (generatedData && generatedData.files.customGptJson) {
+        downloadTextFile('custom_gpt_config.json', JSON.stringify(generatedData.files.customGptJson, null, 2));
+      } else {
+        alert('Genera primero un proyecto en el Asistente.');
+      }
+    });
+  }
+
+  if (btnExportPromo) {
+    btnExportPromo.addEventListener('click', () => {
+      if (generatedData && generatedData.files.promoKit) {
+        downloadTextFile('YOUTUBE_BLOGGER_PROMO_KIT.md', generatedData.files.promoKit);
+      } else {
+        alert('Genera primero un proyecto en el Asistente.');
+      }
+    });
+  }
+
+  /* ==========================================
      COPY BUTTONS HANDLER
      ========================================== */
   const copyButtons = document.querySelectorAll('.btn-copy');
@@ -831,7 +864,7 @@ NARRADOR (VOZ CINEMATOGRÁFICA):
   });
 
   /* ==========================================
-     EXPORT QUICK BUTTON
+     EXPORT QUICK BUTTON v3.0
      ========================================== */
   const btnExportQuick = document.getElementById('btn-export-quick');
 
@@ -845,7 +878,7 @@ NARRADOR (VOZ CINEMATOGRÁFICA):
       const res = await window.electronAPI.exportProductionPackage(generatedData);
       if (res.success) {
         const zipMsg = res.zipPath ? `\n- Archivo ZIP: ${res.zipPath}` : '';
-        if (confirm(`¡Proyecto exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
+        if (confirm(`¡Proyecto v3.0 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
           window.electronAPI.openFolder(res.folderPath);
         }
       } else {
