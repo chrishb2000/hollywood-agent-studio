@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO v3.0 PRO SUITE - RENDERER SCRIPT
+   HOLLYWOOD AGENT STUDIO v3.5 PRO SUITE - RENDERER SCRIPT WITH LIVE TESTERS
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentProjectId = null;
 
   let appSettings = {
-    provider: 'offline',
+    provider: 'ollama',
     geminiKey: '',
     openaiKey: '',
     claudeKey: '',
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elevenlabsKey: '',
     fluxKey: '',
     ollamaUrl: 'http://localhost:11434',
+    ollamaModel: 'llama3:latest',
     lmstudioUrl: 'http://localhost:1234',
     comfyUrl: 'http://127.0.0.1:8188',
     webuiUrl: 'http://127.0.0.1:7860',
@@ -134,7 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
       artStyle: document.getElementById('art-style').value,
       cameraStyle: document.getElementById('camera-style').value,
       voiceoverStyle: document.getElementById('voiceover-style').value,
-      musicStyle: document.getElementById('music-style').value
+      musicStyle: document.getElementById('music-style').value,
+      // Textarea References v3.5
+      formatReferences: document.getElementById('format-references') ? document.getElementById('format-references').value : '',
+      plotReferences: document.getElementById('plot-references') ? document.getElementById('plot-references').value : '',
+      characterReferences: document.getElementById('character-references') ? document.getElementById('character-references').value : '',
+      scenarioReferences: document.getElementById('scenario-references') ? document.getElementById('scenario-references').value : '',
+      styleAudioReferences: document.getElementById('style-audio-references') ? document.getElementById('style-audio-references').value : ''
     };
   }
 
@@ -155,6 +162,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.cameraStyle) document.getElementById('camera-style').value = data.cameraStyle;
     if (data.voiceoverStyle) document.getElementById('voiceover-style').value = data.voiceoverStyle;
     if (data.musicStyle) document.getElementById('music-style').value = data.musicStyle;
+    if (data.formatReferences && document.getElementById('format-references')) document.getElementById('format-references').value = data.formatReferences;
+    if (data.plotReferences && document.getElementById('plot-references')) document.getElementById('plot-references').value = data.plotReferences;
+    if (data.characterReferences && document.getElementById('character-references')) document.getElementById('character-references').value = data.characterReferences;
+    if (data.scenarioReferences && document.getElementById('scenario-references')) document.getElementById('scenario-references').value = data.scenarioReferences;
+    if (data.styleAudioReferences && document.getElementById('style-audio-references')) document.getElementById('style-audio-references').value = data.styleAudioReferences;
   }
 
   function saveCurrentProjectState() {
@@ -237,7 +249,12 @@ document.addEventListener('DOMContentLoaded', () => {
       artStyle: 'Fotorrealista Cinematográfico (35mm Anamórfico)',
       cameraStyle: 'Movimientos Dinámicos (Dolly, Steadicam, Drone Shots)',
       voiceoverStyle: 'Voz Masculina Grave y Profunda (Narrador Hollywood)',
-      musicStyle: 'Sintetizador y Orquesta'
+      musicStyle: 'Sintetizador y Orquesta',
+      formatReferences: '',
+      plotReferences: '',
+      characterReferences: '',
+      scenarioReferences: '',
+      styleAudioReferences: ''
     });
 
     document.getElementById('output-memory').value = '';
@@ -374,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     SETTINGS MODAL & PROVIDERS v3.0
+     SETTINGS MODAL & LIVE CONNECTION TESTERS v3.5
      ========================================== */
   const btnSettings = document.getElementById('btn-settings');
   const modalSettings = document.getElementById('settings-modal');
@@ -405,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function applySettingsToUI() {
-    document.getElementById('ai-provider').value = appSettings.provider || 'offline';
+    document.getElementById('ai-provider').value = appSettings.provider || 'ollama';
     document.getElementById('gemini-key').value = appSettings.geminiKey || '';
     document.getElementById('openai-key').value = appSettings.openaiKey || '';
     document.getElementById('claude-key').value = appSettings.claudeKey || '';
@@ -427,6 +444,10 @@ document.addEventListener('DOMContentLoaded', () => {
     appSettings.elevenlabsKey = document.getElementById('elevenlabs-key').value.trim();
     appSettings.fluxKey = document.getElementById('flux-key').value.trim();
     appSettings.ollamaUrl = document.getElementById('ollama-url').value.trim();
+
+    const modelSel = document.getElementById('ollama-model-select');
+    if (modelSel && modelSel.value) appSettings.ollamaModel = modelSel.value;
+
     appSettings.lmstudioUrl = document.getElementById('lmstudio-url').value.trim();
     appSettings.comfyUrl = document.getElementById('comfy-url').value.trim();
     appSettings.webuiUrl = document.getElementById('webui-url').value.trim();
@@ -443,7 +464,199 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ==========================================
-     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v3.0
+     LIVE AI CONNECTION TESTERS FUNCTIONS
+     ========================================== */
+  function setStatusBadge(elementId, status, message) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    if (status === 'testing') {
+      el.innerHTML = `<span class="status-badge testing"><i class="fa-solid fa-spinner fa-spin"></i> ${message}</span>`;
+    } else if (status === 'connected') {
+      el.innerHTML = `<span class="status-badge connected"><i class="fa-solid fa-check"></i> ${message}</span>`;
+    } else if (status === 'error') {
+      el.innerHTML = `<span class="status-badge error"><i class="fa-solid fa-triangle-exclamation"></i> ${message}</span>`;
+    }
+  }
+
+  // 1. Test Ollama Connection
+  const btnTestOllama = document.getElementById('btn-test-ollama');
+  if (btnTestOllama) {
+    btnTestOllama.addEventListener('click', async () => {
+      const url = document.getElementById('ollama-url').value.trim() || 'http://localhost:11434';
+      setStatusBadge('status-ollama', 'testing', 'Conectando con servidor Ollama local...');
+      const startTime = Date.now();
+
+      try {
+        const response = await fetch(`${url}/api/tags`);
+        const latency = Date.now() - startTime;
+        if (response.ok) {
+          const data = await response.json();
+          const models = data.models || [];
+          const modelNames = models.map(m => m.name);
+
+          // Populate Ollama Select Dropdown
+          const groupSelect = document.getElementById('group-ollama-model');
+          const selectEl = document.getElementById('ollama-model-select');
+          if (groupSelect && selectEl && modelNames.length > 0) {
+            selectEl.innerHTML = '';
+            modelNames.forEach(m => {
+              const opt = document.createElement('option');
+              opt.value = m;
+              opt.textContent = `${m} (Instalado localmente)`;
+              selectEl.appendChild(opt);
+            });
+            groupSelect.style.display = 'block';
+          }
+
+          setStatusBadge('status-ollama', 'connected', `✓ Conectado a Ollama (${latency}ms) - ${models.length} modelos detectados`);
+        } else {
+          setStatusBadge('status-ollama', 'error', `Error HTTP ${response.status} en Ollama`);
+        }
+      } catch (err) {
+        setStatusBadge('status-ollama', 'error', `No se pudo conectar a ${url}. Verifica que Ollama esté ejecutándose.`);
+      }
+    });
+  }
+
+  // 2. Test LM Studio Connection
+  const btnTestLmStudio = document.getElementById('btn-test-lmstudio');
+  if (btnTestLmStudio) {
+    btnTestLmStudio.addEventListener('click', async () => {
+      const url = document.getElementById('lmstudio-url').value.trim() || 'http://localhost:1234';
+      setStatusBadge('status-lmstudio', 'testing', 'Verificando puerto LM Studio...');
+      const startTime = Date.now();
+
+      try {
+        const response = await fetch(`${url}/v1/models`);
+        const latency = Date.now() - startTime;
+        if (response.ok) {
+          setStatusBadge('status-lmstudio', 'connected', `✓ Servidor LM Studio Activo (${latency}ms)`);
+        } else {
+          setStatusBadge('status-lmstudio', 'error', `Error HTTP ${response.status} en LM Studio`);
+        }
+      } catch (err) {
+        setStatusBadge('status-lmstudio', 'error', `No se pudo conectar a ${url}`);
+      }
+    });
+  }
+
+  // 3. Test OpenAI API Key
+  const btnTestOpenAI = document.getElementById('btn-test-openai');
+  if (btnTestOpenAI) {
+    btnTestOpenAI.addEventListener('click', async () => {
+      const key = document.getElementById('openai-key').value.trim();
+      if (!key) {
+        setStatusBadge('status-openai', 'error', 'Introduce una API Key de OpenAI para probar');
+        return;
+      }
+      setStatusBadge('status-openai', 'testing', 'Verificando API Key...');
+      try {
+        const res = await fetch('https://api.openai.com/v1/models', {
+          headers: { 'Authorization': `Bearer ${key}` }
+        });
+        if (res.ok) {
+          setStatusBadge('status-openai', 'connected', '✓ API Key de OpenAI Válida');
+        } else {
+          setStatusBadge('status-openai', 'error', 'API Key de OpenAI inválida o rechazada');
+        }
+      } catch (e) {
+        setStatusBadge('status-openai', 'error', 'Error al conectar con la API de OpenAI');
+      }
+    });
+  }
+
+  // 4. Test Gemini API Key
+  const btnTestGemini = document.getElementById('btn-test-gemini');
+  if (btnTestGemini) {
+    btnTestGemini.addEventListener('click', async () => {
+      const key = document.getElementById('gemini-key').value.trim();
+      if (!key) {
+        setStatusBadge('status-gemini', 'error', 'Introduce una API Key de Google Gemini');
+        return;
+      }
+      setStatusBadge('status-gemini', 'testing', 'Verificando API Key de Gemini...');
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+        if (res.ok) {
+          setStatusBadge('status-gemini', 'connected', '✓ API Key de Google Gemini Válida');
+        } else {
+          setStatusBadge('status-gemini', 'error', 'API Key de Gemini inválida');
+        }
+      } catch (e) {
+        setStatusBadge('status-gemini', 'error', 'Error de red con Google Gemini');
+      }
+    });
+  }
+
+  // 5. Test ElevenLabs
+  const btnTestElevenLabs = document.getElementById('btn-test-elevenlabs');
+  if (btnTestElevenLabs) {
+    btnTestElevenLabs.addEventListener('click', async () => {
+      const key = document.getElementById('elevenlabs-key').value.trim();
+      if (!key) {
+        setStatusBadge('status-elevenlabs', 'error', 'Introduce tu API Key de ElevenLabs');
+        return;
+      }
+      setStatusBadge('status-elevenlabs', 'testing', 'Verificando cuenta de ElevenLabs...');
+      try {
+        const res = await fetch('https://api.elevenlabs.io/v1/user', {
+          headers: { 'xi-api-key': key }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const count = data.subscription?.character_count || 0;
+          const limit = data.subscription?.character_limit || 0;
+          setStatusBadge('status-elevenlabs', 'connected', `✓ ElevenLabs Conectado (${count}/${limit} caracteres usados)`);
+        } else {
+          setStatusBadge('status-elevenlabs', 'error', 'API Key de ElevenLabs inválida');
+        }
+      } catch (e) {
+        setStatusBadge('status-elevenlabs', 'error', 'Error de conexión con ElevenLabs');
+      }
+    });
+  }
+
+  // 6. Test ComfyUI
+  const btnTestComfy = document.getElementById('btn-test-comfy');
+  if (btnTestComfy) {
+    btnTestComfy.addEventListener('click', async () => {
+      const url = document.getElementById('comfy-url').value.trim() || 'http://127.0.0.1:8188';
+      setStatusBadge('status-comfy', 'testing', 'Conectando con ComfyUI local...');
+      try {
+        const res = await fetch(`${url}/system_stats`);
+        if (res.ok) {
+          setStatusBadge('status-comfy', 'connected', '✓ Servidor ComfyUI Local Activo');
+        } else {
+          setStatusBadge('status-comfy', 'error', `Error HTTP ${res.status}`);
+        }
+      } catch (e) {
+        setStatusBadge('status-comfy', 'error', `No se encontró servidor ComfyUI en ${url}`);
+      }
+    });
+  }
+
+  // 7. Test WebUI (Automatic1111)
+  const btnTestWebUI = document.getElementById('btn-test-webui');
+  if (btnTestWebUI) {
+    btnTestWebUI.addEventListener('click', async () => {
+      const url = document.getElementById('webui-url').value.trim() || 'http://127.0.0.1:7860';
+      setStatusBadge('status-webui', 'testing', 'Conectando con Automatic1111 WebUI...');
+      try {
+        const res = await fetch(`${url}/sdapi/v1/sd-models`);
+        if (res.ok) {
+          setStatusBadge('status-webui', 'connected', '✓ Servidor Automatic1111 WebUI Activo');
+        } else {
+          setStatusBadge('status-webui', 'error', `Error HTTP ${res.status}`);
+        }
+      } catch (e) {
+        setStatusBadge('status-webui', 'error', `No se encontró servidor WebUI en ${url}`);
+      }
+    });
+  }
+
+  /* ==========================================
+     HOLLYWOOD 10 AGENTS ENGINE & PRO ORCHESTRATOR v3.5
      ========================================== */
   const btnRunGeneration = document.getElementById('btn-run-generation');
 
@@ -451,11 +664,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputs = getWizardFormData();
 
     btnRunGeneration.disabled = true;
-    btnRunGeneration.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GENERANDO STORYBOARD & PAQUETE PRO v3.0...';
+    btnRunGeneration.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CONECTANDO CON IA & GENERANDO PRODUCCIÓN...';
+
+    let aiGeneratedScript = null;
+
+    // Check if Ollama is selected & active to make real HTTP query
+    if (appSettings.provider === 'ollama') {
+      try {
+        const ollamaUrl = appSettings.ollamaUrl || 'http://localhost:11434';
+        const modelName = appSettings.ollamaModel || 'llama3:latest';
+        
+        const promptText = `Eres un Showrunner de Hollywood. Genera la escena principal del Capítulo 1 para la serie "${inputs.projectTitle}". Sinopsis: ${inputs.storyPremise}. Protagonista: ${inputs.protagonistDetails}. Referencias: ${inputs.plotReferences}`;
+        
+        const response = await fetch(`${ollamaUrl}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: modelName,
+            prompt: promptText,
+            stream: false
+          })
+        });
+
+        if (response.ok) {
+          const resData = await response.json();
+          aiGeneratedScript = resData.response;
+        }
+      } catch (e) {
+        console.warn('Ollama local API offline or failed, falling back to Hollywood Engine:', e);
+      }
+    }
 
     setTimeout(() => {
-      // Build Full Production Output Data v3.0
-      generatedData = buildHollywoodProductionBundleV3(inputs);
+      // Build Full Production Output Data v3.5
+      generatedData = buildHollywoodProductionBundleV3(inputs, aiGeneratedScript);
 
       // Populate UI Outputs
       populateGeneratedOutputs(generatedData);
@@ -464,20 +706,20 @@ document.addEventListener('DOMContentLoaded', () => {
       saveCurrentProjectState();
 
       btnRunGeneration.disabled = false;
-      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN PRO v3.0 (STORYBOARD + EDL/XML + PROMO KIT)';
+      btnRunGeneration.innerHTML = '<i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN CON PROBADOR DE IA & REFERENCIAS';
 
       // Switch to Storyboard Tab automatically
       const storyboardTabBtn = document.querySelector('[data-tab="tab-storyboard"]');
       if (storyboardTabBtn) storyboardTabBtn.click();
 
-      alert(`¡Producción v3.0 generada exitosamente para "${inputs.projectTitle}"!\nSe ha creado el Storyboard Visual, la línea de tiempo EDL/XML para DaVinci/Premiere y el Kit Promocional.`);
+      alert(`¡Producción v3.5 generada exitosamente para "${inputs.projectTitle}"!\nSe han incorporado todas las referencias de formato, guion, personajes y escenografía.`);
     }, 1500);
   });
 
   /* ==========================================
-     HOLLYWOOD AGENTS v3.0 PRO BUNDLE BUILDER
+     HOLLYWOOD AGENTS v3.5 PRO BUNDLE BUILDER
      ========================================== */
-  function buildHollywoodProductionBundleV3(inputs) {
+  function buildHollywoodProductionBundleV3(inputs, realAiResponse) {
     const title = inputs.projectTitle;
     const episodes = inputs.episodesCount;
     const type = inputs.projectType;
@@ -489,6 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         name: extractName(inputs.protagonistDetails) || 'Carlos',
         role: 'Protagonista Principal',
         details: inputs.protagonistDetails,
+        references: inputs.characterReferences || 'Sin referencias específicas',
         wardrobeStart: 'Camisa desgastada azul oscuro, jeans descoloridos, tenis viejos',
         wardrobeEnd: 'Traje de tres piezas gris marengo italiano, reloj de pulsera de lujo, zapatos Oxford de cuero pulido'
       }
@@ -501,12 +744,13 @@ document.addEventListener('DOMContentLoaded', () => {
         name: extractName(line) || `Personaje_${idx + 2}`,
         role: 'Personaje Secundario / Antagonista',
         details: line,
+        references: inputs.characterReferences || 'Atuendo profesional formal según su rol',
         wardrobeStart: 'Atuendo profesional formal según su rol',
         wardrobeEnd: 'Atuendo formal con accesorios distintivos'
       });
     });
 
-    // 1. Build Storyboard Frames
+    // 1. Build Storyboard Frames with References
     const storyboardFrames = [];
     const shotsPerEp = 4;
     for (let ep = 1; ep <= episodes; ep++) {
@@ -517,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
           shotNumber: s,
           angle: shotAngle,
           title: `Capítulo ${ep} - Plano ${s}: ${shotAngle}`,
-          desc: `Tomas de la fase ${ep} mostrando a ${characterList[0].name} en el entorno.`,
+          desc: `Tomas de la fase ${ep} mostrando a ${characterList[0].name}. Estilo de cámara: ${inputs.cameraStyle}.`,
           prompt: `Cinematic ${shotAngle.toLowerCase()} shot of ${characterList[0].name}, ${inputs.artStyle}, lighting in ${inputs.colorPalette}, photorealistic 8k --ar 16:9`
         });
       }
@@ -531,7 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const estimatedRenderTime = Math.ceil((soraVideoShots * 0.5) + (fluxImageRenders * 0.1));
 
     // 3. 00_SYSTEM_MEMORY_PATTERN.md
-    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v3.0)
+    const memoryPattern = `# PATRÓN DE MEMORIA CONTINUADA & REGLAS DE COHERENCIA (AI MEMORY PATTERN v3.5)
 PROYECTO: ${title.toUpperCase()}
 ID DE SEMILLA DE PRODUCCIÓN: SEED_${title.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}_2026
 
@@ -541,14 +785,16 @@ ${characterList.map(char => `
 - **Nombre Fijo:** ${char.name}
 - **Rol:** ${char.role}
 - **Rasgos Físicos Permanentes:** ${char.details}
+- **Referencias de Estilo:** ${char.references}
 - **Vestuario Fase 1:** ${char.wardrobeStart}
 - **Vestuario Fase 2:** ${char.wardrobeEnd}
 `).join('\n')}
 
 ## 📋 REGLAS ESTRICTAS DE CONTINUIDAD:
 1. Consistencia facial obligatoria en todas las tomas.
-2. Evolución estricta del vestuario de la fase 1 a la fase 2.
-3. Coherencia cromática: "${inputs.colorPalette}".
+2. Referencias de Formato: "${inputs.formatReferences}".
+3. Referencias Escenográficas: "${inputs.scenarioReferences}".
+4. Coherencia cromática: "${inputs.colorPalette}".
 `;
 
     // 4. DaVinci Resolve EDL (CMX3600 Standard)
@@ -585,14 +831,14 @@ ${characterList.map(char => `
 </xmeml>`;
 
     // 6. Kit Promocional de YouTube & Blogger
-    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER
+    const promoKit = `# KIT PROMOCIONAL PARA YOUTUBE & BLOGGER v3.5
 PROYECTO: ${title}
 
 ## 📺 YOUTUBE METADATA & SEO
 
 ### TÍTULOS SUGERIDOS PARA YOUTUBE:
 1. 🔥 De la Pobreza Extrema a la Cúspide Tecnológica | ${title} (Episodio 1)
-2. El Secreto que Nadie te Cuenta para Construir un Imperio desde Cero 💡
+2. El Secreto para Construir un Imperio desde Cero 💡
 3. ${title}: La Serie que Cambiará tu Perspectiva del Éxito Financiero
 
 ### DESCRIPCIÓN OPTIMIZADA PARA YOUTUBE:
@@ -612,7 +858,7 @@ Si te ha gustado el video no olvides darle un me gusta y suscribirte, hasta la v
 
 ### PROMPT PARA LA MINIATURA DE YOUTUBE (THUMBNAIL PROMPT):
 \`\`\`text
-YouTube thumbnail style, high contrast dramatic split screen: left side shows ${characterList[0].name} in a dark humble room studying on an old laptop, right side shows ${characterList[0].name} in a luxury suit on top of a futuristic skyscraper, bold 3D text "DE POBRE A RICO", photorealistic 8k, vibrant colors --ar 16:9
+YouTube thumbnail style, high contrast dramatic split screen: left side shows ${characterList[0].name} in a dark humble room studying on an old laptop, right side shows ${characterList[0].name} in a luxury suit on top of a futuristic skyscraper, bold 3D text "DE POBRE A RICO", photorealistic 8k --ar 16:9
 \`\`\`
 
 ---
@@ -624,24 +870,29 @@ YouTube thumbnail style, high contrast dramatic split screen: left side shows ${
 En el mundo hiperconectado de hoy, las historias de superación personal no solo nos inspiran, sino que nos brindan una hoja de ruta práctica para transformar nuestras propias vidas.
 
 La nueva serie cinematográfica "${title}" relata el camino de ${characterList[0].name}, un joven autodidacta que convirtió las limitaciones de su entorno en el combustible para crear un imperio tecnológico.
-
-#### Beneficios y Lecciones Clave de la Producción:
-1. **La Mentalidad Autodidacta**: Cómo el aprendizaje continuo supera cualquier falta de capital inicial.
-2. **Resiliencia ante el Fraude**: Estrategias para proteger tu visión cuando enfrentas sabotajes financieros.
-3. **Escalabilidad y Visión**: Cómo pasar de un prototipo en un garaje a una empresa de alcance internacional.
-
-Disfruta de la producción completa y aplica estas valiosas lecciones a tus proyectos personales.
 `;
 
-    // 7. System Prompts & Other Files
-    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v3.0\nPROYECTO: ${title}`;
-    const agentRules = `# AGENT RULES v3.0`;
-    const projectBible = `# PROJECT BIBLE v3.0\n${inputs.storyPremise}`;
-    const characters = `# DOSSIER CHARACTERS v3.0`;
-    const environments = `# DOSSIER ENVIRONMENTS v3.0`;
-    const scripts = `# FULL SCRIPT v3.0`;
-    const cinematography = `# CINEMATOGRAPHY SHOT LIST v3.0`;
-    const audio = `# AUDIO GUIDE v3.0`;
+    // 7. System Prompts & Full Scripts
+    let scripts = `# GUION CINEMATOGRÁFICO DESGLOSADO POR ESCENAS (CON REFERENCIAS ADICIONALES)
+PROYECTO: ${title}
+NOTAS DE TRAMA & GIROS: ${inputs.plotReferences}
+REFERENCIAS DE RITMO: ${inputs.formatReferences}
+
+`;
+
+    if (realAiResponse) {
+      scripts += `\n--- RESPUESTA GENERADA EN TIEMPO REAL POR OLLAMA AI ---\n\n${realAiResponse}\n\n================================================================================\n`;
+    }
+
+    scripts += generateFullScriptTextV3(episodes, title, characterList, inputs);
+
+    const systemPrompts = `# HOLLYWOOD SYSTEM PROMPTS v3.5\nPROYECTO: ${title}\nREFERENCIAS DE DIRECCIÓN: ${inputs.styleAudioReferences}`;
+    const agentRules = `# AGENT RULES v3.5`;
+    const projectBible = `# PROJECT BIBLE v3.5\nPREMISA: ${inputs.storyPremise}\nNOTAS ADICIONALES: ${inputs.plotReferences}`;
+    const characters = `# DOSSIER CHARACTERS v3.5\nREFERENCIAS DE ACTORES: ${inputs.characterReferences}`;
+    const environments = `# DOSSIER ENVIRONMENTS v3.5\nREFERENCIAS DE ESCENOGRAFÍA: ${inputs.scenarioReferences}`;
+    const cinematography = `# CINEMATOGRAPHY SHOT LIST v3.5\nESTILO VISUAL: ${inputs.artStyle}\nREFERENCIAS: ${inputs.styleAudioReferences}`;
+    const audio = `# AUDIO GUIDE v3.5\nPROCESAMIENTO VOICEOVER: ${inputs.voiceoverStyle}`;
 
     const customGptJson = {
       name: title,
@@ -666,7 +917,7 @@ Disfruta de la producción completa y aplica estas valiosas lecciones a tus proy
         type,
         episodesCount: episodes,
         generatedAt: new Date().toISOString(),
-        engine: 'Hollywood Agent Studio v3.0 Pro'
+        engine: 'Hollywood Agent Studio v3.5 Pro'
       },
       files: {
         memoryPattern,
@@ -685,6 +936,43 @@ Disfruta de la producción completa y aplica estas valiosas lecciones a tus proy
         modelfile
       }
     };
+  }
+
+  function generateFullScriptTextV3(episodesCount, title, characterList, inputs) {
+    let fullScript = '';
+    const protagonist = characterList[0]?.name || 'CARLOS';
+    const antagonist = characterList[1]?.name || 'ROBERTO';
+
+    for (let ep = 1; ep <= episodesCount; ep++) {
+      fullScript += `
+================================================================================
+CAPÍTULO ${ep}: "DESARROLLO DE ESCENA ${ep}"
+================================================================================
+
+ESCENA 1. INT. HABITACIÓN / OFICINA - NOCHE
+
+[NOTAS DE REFERENCIA: ${inputs.scenarioReferences || 'Entorno cinematográfico en alto contraste'}]
+[CONTINUITY NOTE: ${protagonist.toUpperCase()} viste ${ep <= 2 ? 'ropa humilde azul desgastada' : 'traje de tres piezas de lujo'}]
+
+La luz tenue ilumina el rostro de ${protagonist.toUpperCase()}.
+
+${protagonist.toUpperCase()}
+(firme, con mirada determinada)
+Cada línea de código que escribo es un paso fuera de la oscuridad.
+
+${antagonist.toUpperCase()}
+(entrando en cuadro)
+El mercado no respeta los sueños sin capital, ${protagonist}.
+
+${protagonist.toUpperCase()}
+El capital se construye con determinación. Observa cómo cambia la historia.
+
+[CORTE A NEGRO]
+
+---
+`;
+    }
+    return fullScript;
   }
 
   function extractName(text) {
@@ -786,7 +1074,7 @@ Disfruta de la producción completa y aplica estas valiosas lecciones a tus proy
   }
 
   /* ==========================================
-     PRO EXPORT BUTTONS HANDLER v3.0
+     PRO EXPORT BUTTONS HANDLER
      ========================================== */
   const btnExportEdl = document.getElementById('btn-export-edl');
   const btnExportXml = document.getElementById('btn-export-xml');
@@ -864,7 +1152,7 @@ Disfruta de la producción completa y aplica estas valiosas lecciones a tus proy
   });
 
   /* ==========================================
-     EXPORT QUICK BUTTON v3.0
+     EXPORT QUICK BUTTON v3.5
      ========================================== */
   const btnExportQuick = document.getElementById('btn-export-quick');
 
@@ -878,7 +1166,7 @@ Disfruta de la producción completa y aplica estas valiosas lecciones a tus proy
       const res = await window.electronAPI.exportProductionPackage(generatedData);
       if (res.success) {
         const zipMsg = res.zipPath ? `\n- Archivo ZIP: ${res.zipPath}` : '';
-        if (confirm(`¡Proyecto v3.0 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
+        if (confirm(`¡Proyecto v3.5 exportado exitosamente!\n- Carpeta: ${res.folderPath}${zipMsg}\n\n¿Deseas abrir la carpeta en el Explorador?`)) {
           window.electronAPI.openFolder(res.folderPath);
         }
       } else {

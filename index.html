@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hollywood Agent Studio v3.0 Pro Suite - IA Production Suite</title>
+  <title>Hollywood Agent Studio v3.5 Pro Suite - IA Production Suite</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Remix Icons / FontAwesome fallback icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,7 +19,7 @@
       <i class="fa-solid fa-clapperboard logo-icon"></i>
       <div class="brand-text">
         <span class="title">HOLLYWOOD AGENT STUDIO</span>
-        <span class="subtitle">v3.0 Pro Suite • Storyboard & Conexiones IA</span>
+        <span class="subtitle">v3.5 Pro • Probador de Conexiones IA & Referencias</span>
       </div>
     </div>
 
@@ -61,7 +61,7 @@
         <i class="fa-solid fa-gear"></i>
       </button>
       <!-- Export Quick Button -->
-      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v3.0">
+      <button id="btn-export-quick" class="btn btn-accent" title="Exportar Paquete Completo ZIP v3.5">
         <i class="fa-solid fa-file-zipper"></i> Exportar ZIP
       </button>
     </div>
@@ -80,7 +80,6 @@
       </div>
 
       <div class="sidebar-project-list" id="projects-list-container">
-        <!-- Projects rendered dynamically via renderer.js -->
         <div class="sidebar-empty-state">
           <i class="fa-solid fa-film"></i>
           <p>No hay proyectos guardados. Configura uno y presiona "Guardar".</p>
@@ -96,8 +95,8 @@
         <div class="wizard-container">
           
           <div class="wizard-header">
-            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v3.0 Pro</h2>
-            <p>Configura tu producción paso a paso. La red de 10 agentes de Hollywood desarrollará toda la pre-producción, storyboard visual, guiones, vestuario, continuidad y patrones de memoria.</p>
+            <h2><i class="fa-solid fa-film"></i> Asistente de Producción Audiovisual v3.5</h2>
+            <p>Configura tu producción paso a paso con campos de referencias detalladas por apartado para una orquestación precisa.</p>
           </div>
 
           <!-- WIZARD STEPPER INDICATOR -->
@@ -133,8 +132,8 @@
 
             <!-- STEP 1: FORMAT & TYPE -->
             <div class="wizard-step-content active" id="step-content-1">
-              <h3><i class="fa-solid fa-list-check"></i> ¿Qué deseas producir hoy?</h3>
-              <p class="section-desc">Selecciona la estructura narrativa y el tipo de contenido que deseas desarrollar.</p>
+              <h3><i class="fa-solid fa-list-check"></i> 1. Tipo de Producción & Referencias de Formato</h3>
+              <p class="section-desc">Selecciona la estructura narrativa y añade observaciones de formato que guiarán la producción.</p>
               
               <div class="form-grid">
                 <div class="form-group">
@@ -170,16 +169,22 @@
                   </select>
                 </div>
               </div>
+
+              <!-- TEXTAREA REFERENCIAS PASO 1 -->
+              <div class="form-group mt-3">
+                <label for="format-references"><i class="fa-solid fa-note-sticky"></i> Referencias Adicionales de Formato & Ritmo Narrativo</label>
+                <textarea id="format-references" class="form-control" rows="3" placeholder="Ej: Inspirarse en la estructura acelerada de episodios de series como Succession o Billions, con cortes rápidos y diálogos ágiles.">Estructura dinámica de episodios con introducción contundente de 15 segundos, ritmo acelerado y ganchos de alta tensión al final de cada episodio.</textarea>
+              </div>
             </div>
 
             <!-- STEP 2: STORY PREMISE & PLOT -->
             <div class="wizard-step-content" id="step-content-2">
-              <h3><i class="fa-solid fa-book-open"></i> Idea General & Premisa Narrativa</h3>
-              <p class="section-desc">Describe la trama principal, el conflicto y la evolución narrativa.</p>
+              <h3><i class="fa-solid fa-book-open"></i> 2. Premisa Narrativa & Notas de Guion</h3>
+              <p class="section-desc">Describe la trama principal, giros de tuerca y referencias de guion.</p>
 
               <div class="form-group">
-                <label for="story-premise"><i class="fa-solid fa-pen-nib"></i> Premisa / Sinopsis de la Historia</label>
-                <textarea id="story-premise" class="form-control" rows="5" placeholder="Ej: Serie de 4 capítulos sobre un hombre que se convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
+                <label for="story-premise"><i class="fa-solid fa-pen-nib"></i> Premisa / Sinopsis General de la Historia</label>
+                <textarea id="story-premise" class="form-control" rows="4" placeholder="Ej: Serie de 4 capítulos sobre un hombre que se convierte de pobre a rico...">Serie de 4 capítulos sobre la vida de Carlos, un hombre de origen extremadamente humilde que vive en la pobreza. A través del aprendizaje autodidacta en programación y negocios digitales, supera graves crisis financieras, traiciones familiares y rechazos, hasta convertirse en el fundador de una de las empresas tecnológicas más prósperas del país.</textarea>
               </div>
 
               <div class="form-grid">
@@ -205,12 +210,18 @@
                   </select>
                 </div>
               </div>
+
+              <!-- TEXTAREA REFERENCIAS PASO 2 -->
+              <div class="form-group mt-3">
+                <label for="plot-references"><i class="fa-solid fa-lightbulb"></i> Referencias Adicionales de Trama, Giros de Tuerca & Subtramas</label>
+                <textarea id="plot-references" class="form-control" rows="3" placeholder="Ej: En el capítulo 3 debe ocurrir una traición inesperada de su primer socio que lo obliga a reiniciar todo en 24 horas...">En el Capítulo 3 ocurre la traición inesperada de su socio inversor Roberto, quien intenta robar la patente. Carlos debe apoyarse en su mentora Elena para lanzar una versión beta mejorada antes del amanecer.</textarea>
+              </div>
             </div>
 
             <!-- STEP 3: CHARACTERS -->
             <div class="wizard-step-content" id="step-content-3">
-              <h3><i class="fa-solid fa-users"></i> Definición de Personajes</h3>
-              <p class="section-desc">Detalla quiénes participarán en la producción para generar prompts de consistencia de rostro, vestuario y personalidad.</p>
+              <h3><i class="fa-solid fa-users"></i> 3. Personajes & Referencias de Estilo</h3>
+              <p class="section-desc">Detalla quiénes participarán y sus referencias de actores o estilos visuales.</p>
 
               <div class="form-grid">
                 <div class="form-group">
@@ -226,18 +237,24 @@
 
               <div class="form-group mt-3">
                 <label for="secondary-characters"><i class="fa-solid fa-people-group"></i> Personajes Secundarios / Antagonistas</label>
-                <textarea id="secondary-characters" class="form-control" rows="4" placeholder="Ej: 1. Elena (Mentora)...">1. Elena (38 años, empresaria experimentada que se convierte en mentora de Carlos)&#10;2. Roberto (45 años, inversionista sin escrúpulos que intenta arruinar el primer prototipo de Carlos)&#10;3. Lucía (Hermana menor de Carlos, a quien promete sacar de la pobreza)</textarea>
+                <textarea id="secondary-characters" class="form-control" rows="3" placeholder="Ej: 1. Elena (Mentora)...">1. Elena (38 años, empresaria experimentada que se convierte en mentora de Carlos)&#10;2. Roberto (45 años, inversionista sin escrúpulos que intenta arruinar el primer prototipo de Carlos)&#10;3. Lucía (Hermana menor de Carlos, a quien promete sacar de la pobreza)</textarea>
+              </div>
+
+              <!-- TEXTAREA REFERENCIAS PASO 3 -->
+              <div class="form-group mt-3">
+                <label for="character-references"><i class="fa-solid fa-id-badge"></i> Referencias de Actores, Estilo & Rasgos Psicológicos</label>
+                <textarea id="character-references" class="form-control" rows="3" placeholder="Ej: Protagonista inspirado físicamente en la intensidad de Cillian Murphy con vestuario minimalista de tecnología...">Carlos posee una mirada intensa y determinada, peinado corto impecable y gestos tranquilos. Elena vista trajes de corte moderno con tonos violetas y dorados.</textarea>
               </div>
             </div>
 
             <!-- STEP 4: SCENARIOS & LOCATIONS -->
             <div class="wizard-step-content" id="step-content-4">
-              <h3><i class="fa-solid fa-mountain-city"></i> Escenarios, Ubicaciones & Iluminación</h3>
-              <p class="section-desc">Define los entornos donde transcurrirá la acción para generar conceptos de fondo e iluminación.</p>
+              <h3><i class="fa-solid fa-mountain-city"></i> 4. Escenarios, Ubicaciones & Atrezzo</h3>
+              <p class="section-desc">Define las ubicaciones clave y añade referencias de escenografía e iluminación.</p>
 
               <div class="form-group">
                 <label for="key-locations"><i class="fa-solid fa-location-dot"></i> Ubicaciones Clave de la Historia</label>
-                <textarea id="key-locations" class="form-control" rows="4" placeholder="Ej: 1. Pequeño cuarto humilde...">1. Pequeña habitación humilde con una laptop usada, paredes desgastadas y luz de lámpara cálida.&#10;2. Garaje improvisado convertido en laboratorio de código.&#10;3. Edificio corporativo de alta tecnología con arquitectura de cristal y vista panorámica a la ciudad.&#10;4. Auditorio internacional de premiación empresarial.</textarea>
+                <textarea id="key-locations" class="form-control" rows="3" placeholder="Ej: 1. Pequeño cuarto humilde...">1. Pequeña habitación humilde con una laptop usada, paredes desgastadas y luz de lámpara cálida.&#10;2. Garaje improvisado convertido en laboratorio de código.&#10;3. Edificio corporativo de alta tecnología con arquitectura de cristal y vista panorámica a la ciudad.&#10;4. Auditorio internacional de premiación empresarial.</textarea>
               </div>
 
               <div class="form-grid">
@@ -256,12 +273,18 @@
                   <input type="text" id="color-palette" class="form-control" placeholder="Ej: Azules fríos iniciales -> Dorados cinematográficos" value="Tonalidades azules frías al inicio (pobreza) evoluciona a tonos dorados ambarinos de alto contraste (éxito)">
                 </div>
               </div>
+
+              <!-- TEXTAREA REFERENCIAS PASO 4 -->
+              <div class="form-group mt-3">
+                <label for="scenario-references"><i class="fa-solid fa-archway"></i> Referencias Escenográficas, Utilería & Fotografías de Inspiración</label>
+                <textarea id="scenario-references" class="form-control" rows="3" placeholder="Ej: Paredes de ladrillo visto, iluminación tipo chiaroscuro, tecnología vintage de inicios de siglo...">Habitación inicial con luz tenue de lámpara de tungsteno, cuadernos llenos de esquemas de algoritmos y tazas de café acumuladas. Oficina final con cristaleras panorámicas y mobiliario escandinavo de lujo.</textarea>
+              </div>
             </div>
 
             <!-- STEP 5: STYLE, CAMERA & AUDIO -->
             <div class="wizard-step-content" id="step-content-5">
-              <h3><i class="fa-solid fa-sliders"></i> Estilo Visual, Dirección de Cámara & Audio</h3>
-              <p class="section-desc">Establece las directrices técnicas para los generadores de video (Sora, Runway Gen-3, Pika, Midjourney, ElevenLabs).</p>
+              <h3><i class="fa-solid fa-sliders"></i> 5. Estilo Visual, Dirección de Cámara & Audio</h3>
+              <p class="section-desc">Establece el tono técnico y añade referencias de directores o pistas musicales.</p>
 
               <div class="form-grid">
                 <div class="form-group">
@@ -298,12 +321,18 @@
                 </div>
               </div>
 
+              <!-- TEXTAREA REFERENCIAS PASO 5 -->
+              <div class="form-group mt-3">
+                <label for="style-audio-references"><i class="fa-solid fa-clapperboard"></i> Referencias Cinematográficas de Directores, Lentes & Pistas Musicales</label>
+                <textarea id="style-audio-references" class="form-control" rows="3" placeholder="Ej: Dirección de fotografía al estilo Denis Villeneuve con banda sonora orquestal al estilo Hans Zimmer...">Fotografía con lentes anamórficos de 35mm estilo David Fincher, con contraste marcado e iluminación Rembrandt. Música inspirada en composiciones de Hans Zimmer y Max Richter.</textarea>
+              </div>
+
               <!-- GENERATE BUTTON -->
               <div class="generate-box mt-4 text-center">
                 <button id="btn-run-generation" class="btn btn-primary btn-xl">
-                  <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN PRO v3.0 (STORYBOARD + EDL/XML + PROMO KIT)
+                  <i class="fa-solid fa-rocket"></i> GENERAR PRODUCCIÓN CON PROBADOR DE IA & REFERENCIAS
                 </button>
-                <p class="small-hint">Genera la pre-producción completa: Storyboard visual, desglosados, EDL/XML para editores, presupuestos de IA y Kit de YouTube/Blogger.</p>
+                <p class="small-hint">Procesa las referencias con el proveedor de IA configurado (Ollama, Gemini, OpenAI) o motor inteligente.</p>
               </div>
             </div>
 
@@ -323,7 +352,7 @@
       </section>
 
 
-      <!-- ==================== TAB 2: STORYBOARD VISUAL STUDIO v3.0 ==================== -->
+      <!-- ==================== TAB 2: STORYBOARD VISUAL STUDIO v3.5 ==================== -->
       <section id="tab-storyboard" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-image"></i> Visual Storyboard Studio (Previsualización de Tomas)</h2>
@@ -339,14 +368,13 @@
       </section>
 
 
-      <!-- ==================== TAB 3: PRESUPUESTO & EXPORTACIÓN PRO v3.0 ==================== -->
+      <!-- ==================== TAB 3: PRESUPUESTO & EXPORTACIÓN PRO ==================== -->
       <section id="tab-budget-pro" class="tab-pane">
         <div class="section-header">
           <h2><i class="fa-solid fa-calculator"></i> Calculadora de Presupuesto IA & Exportación Pro</h2>
           <p>Estimaciones de consumo de créditos de IA y herramientas para editores de video profesionales (DaVinci Resolve / Premiere Pro).</p>
         </div>
 
-        <!-- BUDGET METRICS CARDS -->
         <div class="metrics-grid">
           <div class="metric-card">
             <div class="metric-icon"><i class="fa-solid fa-microphone"></i></div>
@@ -385,7 +413,6 @@
           </div>
         </div>
 
-        <!-- EXPORT PRO BUTTONS ROW -->
         <div class="export-pro-box mt-4">
           <h3><i class="fa-solid fa-file-export"></i> Exportación de Archivos Pro para Editores & Publicación</h3>
           <div class="export-buttons-row">
@@ -396,10 +423,9 @@
           </div>
         </div>
 
-        <!-- PROMO KIT PREVIEW EDITOR -->
         <div class="editor-container mt-4">
           <div class="output-header">
-            <span class="badge"><i class="fa-brands fa-youtube"></i> Kit Promocional de YouTube & Blogger (Títulos SEO, Descripción, Thumbnail Prompt & Post)</span>
+            <span class="badge"><i class="fa-brands fa-youtube"></i> Kit Promocional de YouTube & Blogger</span>
           </div>
           <textarea id="output-promo-kit" class="code-editor" readonly placeholder="Kit de publicación en YouTube & Blogger..."></textarea>
         </div>
@@ -414,7 +440,6 @@
         </div>
 
         <div class="agents-grid">
-          
           <div class="agent-card highlight-master">
             <div class="agent-avatar"><i class="fa-solid fa-crown"></i></div>
             <div class="agent-info">
@@ -514,7 +539,6 @@
               <div class="agent-status active"><i class="fa-solid fa-circle"></i> En Orquestación</div>
             </div>
           </div>
-
         </div>
       </section>
 
@@ -586,11 +610,11 @@
 
   </div>
 
-  <!-- ==================== SETTINGS MODAL v3.0 ==================== -->
+  <!-- ==================== SETTINGS MODAL WITH CONNECTION TESTERS v3.5 ==================== -->
   <div id="settings-modal" class="modal-overlay">
     <div class="modal-card modal-large">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & APIs v3.0</h3>
+        <h3><i class="fa-solid fa-sliders"></i> Hub de Conexiones IA & Probador de Estado v3.5</h3>
         <button id="btn-close-settings" class="icon-btn-close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       
@@ -605,42 +629,85 @@
         <!-- SECTION: LLMs -->
         <div class="settings-section active" id="sec-llm">
           <div class="form-group">
-            <label for="ai-provider"><i class="fa-solid fa-brain"></i> Proveedor Principal Activo</label>
+            <label for="ai-provider"><i class="fa-solid fa-brain"></i> Proveedor Principal Activo para Generación</label>
             <select id="ai-provider" class="form-control">
-              <option value="offline" selected>Motor Interno Inteligente (Offline Mode / Sin API Key)</option>
-              <option value="gemini">Google Gemini API (Gemini 1.5 Pro / Flash)</option>
+              <option value="offline">Motor Interno Inteligente (Offline Mode)</option>
+              <option value="ollama" selected>Ollama (Servidor Local - Probador Activo)</option>
+              <option value="gemini">Google Gemini API</option>
               <option value="openai">OpenAI (ChatGPT / GPT-4o)</option>
               <option value="claude">Anthropic Claude API</option>
               <option value="openrouter">OpenRouter / Hermes AI</option>
-              <option value="ollama">Ollama (Servidor Local)</option>
               <option value="lmstudio">LM Studio (Servidor Local)</option>
             </select>
           </div>
 
+          <!-- OLLAMA TESTER BOX -->
+          <div class="connection-tester-card mt-2">
+            <div class="form-group">
+              <label for="ollama-url">Ollama Local Server URL</label>
+              <div class="input-with-button">
+                <input type="text" id="ollama-url" class="form-control" value="http://localhost:11434">
+                <button id="btn-test-ollama" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar Ollama</button>
+              </div>
+              <div id="status-ollama" class="status-badge-box"></div>
+            </div>
+
+            <div class="form-group mt-2" id="group-ollama-model" style="display:none;">
+              <label for="ollama-model-select"><i class="fa-solid fa-microchip"></i> Modelo de IA Ollama Instalado Detectado</label>
+              <select id="ollama-model-select" class="form-control">
+                <option value="llama3:latest">llama3:latest (Recomendado)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- LM STUDIO TESTER BOX -->
+          <div class="connection-tester-card mt-2">
+            <div class="form-group">
+              <label for="lmstudio-url">LM Studio Local Server URL</label>
+              <div class="input-with-button">
+                <input type="text" id="lmstudio-url" class="form-control" value="http://localhost:1234">
+                <button id="btn-test-lmstudio" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar LM Studio</button>
+              </div>
+              <div id="status-lmstudio" class="status-badge-box"></div>
+            </div>
+          </div>
+
+          <!-- CLOUD API KEYS TESTERS -->
           <div class="form-grid mt-2">
             <div class="form-group">
               <label for="gemini-key">Google Gemini API Key</label>
-              <input type="password" id="gemini-key" class="form-control" placeholder="AIzaSy...">
+              <div class="input-with-button">
+                <input type="password" id="gemini-key" class="form-control" placeholder="AIzaSy...">
+                <button id="btn-test-gemini" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar</button>
+              </div>
+              <div id="status-gemini" class="status-badge-box"></div>
             </div>
+
             <div class="form-group">
               <label for="openai-key">OpenAI API Key</label>
-              <input type="password" id="openai-key" class="form-control" placeholder="sk-proj-...">
+              <div class="input-with-button">
+                <input type="password" id="openai-key" class="form-control" placeholder="sk-proj-...">
+                <button id="btn-test-openai" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar</button>
+              </div>
+              <div id="status-openai" class="status-badge-box"></div>
             </div>
+
             <div class="form-group">
               <label for="claude-key">Anthropic Claude API Key</label>
-              <input type="password" id="claude-key" class="form-control" placeholder="sk-ant-...">
+              <div class="input-with-button">
+                <input type="password" id="claude-key" class="form-control" placeholder="sk-ant-...">
+                <button id="btn-test-claude" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar</button>
+              </div>
+              <div id="status-claude" class="status-badge-box"></div>
             </div>
+
             <div class="form-group">
               <label for="openrouter-key">OpenRouter API Key</label>
-              <input type="password" id="openrouter-key" class="form-control" placeholder="sk-or-v1-...">
-            </div>
-            <div class="form-group">
-              <label for="ollama-url">Ollama Local URL</label>
-              <input type="text" id="ollama-url" class="form-control" value="http://localhost:11434">
-            </div>
-            <div class="form-group">
-              <label for="lmstudio-url">LM Studio Local URL</label>
-              <input type="text" id="lmstudio-url" class="form-control" value="http://localhost:1234">
+              <div class="input-with-button">
+                <input type="password" id="openrouter-key" class="form-control" placeholder="sk-or-v1-...">
+                <button id="btn-test-openrouter" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar</button>
+              </div>
+              <div id="status-openrouter" class="status-badge-box"></div>
             </div>
           </div>
         </div>
@@ -649,8 +716,11 @@
         <div class="settings-section" id="sec-audio">
           <div class="form-group">
             <label for="elevenlabs-key"><i class="fa-solid fa-key"></i> ElevenLabs API Key (Síntesis de Voz Pro)</label>
-            <input type="password" id="elevenlabs-key" class="form-control" placeholder="sk_...">
-            <span class="small-hint">Se utiliza para la estimación y síntesis directa de locuciones fotorrealistas.</span>
+            <div class="input-with-button">
+              <input type="password" id="elevenlabs-key" class="form-control" placeholder="sk_...">
+              <button id="btn-test-elevenlabs" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar ElevenLabs</button>
+            </div>
+            <div id="status-elevenlabs" class="status-badge-box"></div>
           </div>
         </div>
 
@@ -661,13 +731,23 @@
               <label for="flux-key"><i class="fa-solid fa-key"></i> Flux.1 / DALL-E / Stability API Key</label>
               <input type="password" id="flux-key" class="form-control" placeholder="sk-flux-...">
             </div>
+
             <div class="form-group">
               <label for="comfy-url"><i class="fa-solid fa-server"></i> ComfyUI Local Server URL</label>
-              <input type="text" id="comfy-url" class="form-control" value="http://127.0.0.1:8188">
+              <div class="input-with-button">
+                <input type="text" id="comfy-url" class="form-control" value="http://127.0.0.1:8188">
+                <button id="btn-test-comfy" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar ComfyUI</button>
+              </div>
+              <div id="status-comfy" class="status-badge-box"></div>
             </div>
+
             <div class="form-group">
               <label for="webui-url"><i class="fa-solid fa-sliders"></i> Automatic1111 / WebUI URL</label>
-              <input type="text" id="webui-url" class="form-control" value="http://127.0.0.1:7860">
+              <div class="input-with-button">
+                <input type="text" id="webui-url" class="form-control" value="http://127.0.0.1:7860">
+                <button id="btn-test-webui" class="btn btn-secondary btn-test-conn"><i class="fa-solid fa-vial"></i> Probar WebUI</button>
+              </div>
+              <div id="status-webui" class="status-badge-box"></div>
             </div>
           </div>
         </div>
@@ -684,7 +764,7 @@
   <!-- ==================== FOOTER & CREDITS BAR ==================== -->
   <footer class="app-footer">
     <div class="footer-left">
-      <span>Hollywood Agent Studio v3.0 Pro Suite &copy; 2026</span>
+      <span>Hollywood Agent Studio v3.5 Pro &copy; 2026</span>
       <span class="dot-separator">•</span>
       <span>Desarrollado por <strong><a href="https://christian-freelance.us/" target="_blank" class="credit-link">Christian Herencia</a></strong></span>
     </div>

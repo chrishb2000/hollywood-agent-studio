@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOLLYWOOD AGENT STUDIO v3.0 PRO SUITE - STYLESHEET
+   HOLLYWOOD AGENT STUDIO v3.5 PRO SUITE - STYLESHEET WITH LIVE TESTERS
    ========================================================================== */
 
 :root {
@@ -539,6 +539,62 @@ textarea.form-control {
   margin-top: 8px;
 }
 
+/* INPUT WITH INLINE BUTTON & CONNECTION TESTERS */
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-button .form-control {
+  flex: 1;
+}
+
+.btn-test-conn {
+  white-space: nowrap;
+  font-size: 11px;
+  padding: 6px 12px;
+}
+
+.connection-tester-card {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.status-badge-box {
+  margin-top: 6px;
+  min-height: 20px;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-badge.connected {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--accent-success);
+  border: 1px solid var(--accent-success);
+}
+
+.status-badge.error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--accent-danger);
+  border: 1px solid var(--accent-danger);
+}
+
+.status-badge.testing {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+}
+
 /* WIZARD FOOTER */
 .wizard-footer {
   display: flex;
@@ -548,7 +604,7 @@ textarea.form-control {
   border-top: 1px solid var(--border-color);
 }
 
-/* STORYBOARD GRID v3.0 */
+/* STORYBOARD GRID v3.5 */
 .storyboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -619,7 +675,7 @@ textarea.form-control {
   word-break: break-all;
 }
 
-/* METRICS GRID & BUDGET v3.0 */
+/* METRICS GRID & BUDGET v3.5 */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -887,7 +943,7 @@ textarea.form-control {
   color: var(--accent-gold);
 }
 
-/* SETTINGS MODAL v3.0 */
+/* SETTINGS MODAL v3.5 */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -914,7 +970,7 @@ textarea.form-control {
 }
 
 .modal-card.modal-large {
-  width: 680px;
+  width: 720px;
 }
 
 .modal-header {
